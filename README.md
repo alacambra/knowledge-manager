@@ -1,73 +1,194 @@
-# knowledge-manager
+# Knowledge Manager
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+A modern knowledge management application built with Quarkus backend and Preact frontend, featuring PostgreSQL with vector extensions for AI-powered search and content organization.
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+## Features
 
-## Running the application in dev mode
+- **Quarkus Backend**: Fast, lightweight Java framework
+- **PostgreSQL with pgvector**: Vector database for AI/ML applications
+- **jOOQ**: Type-safe SQL queries
+- **Flyway**: Database migrations
+- **OpenAPI**: Automatic API documentation
+- **Preact Frontend**: Lightweight React alternative
+- **Jakarta EE**: Modern enterprise Java APIs
 
-You can run your application in dev mode that enables live coding using:
-```shell script
-./mvnw compile quarkus:dev
+## Prerequisites
+
+- Java 17+
+- Maven 3.8+
+- Docker & Docker Compose
+- Node.js (for Preact frontend)
+
+## Quick Start
+
+### 1. Clone and Setup
+
+```bash
+# Use the provided Maven archetype command from the setup file
+# Then navigate to the project directory
+cd knowledge-manager
+
+# Copy environment template and configure
+cp .env.backend.example .env.backend
+# Edit .env.backend with your preferred values
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
+### 2. Start PostgreSQL
 
-## Packaging and running the application
+```bash
+# Start PostgreSQL with pgvector extension
+docker-compose up -d postgres
 
-The application can be packaged using:
-```shell script
-./mvnw package
-```
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-```shell script
-./mvnw package -Dquarkus.package.type=uber-jar
+# Wait for database to be ready
+docker-compose logs -f postgres
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+### 3. Run the Application
 
-## Creating a native executable
+```bash
+# Development mode with live reload
+mvn quarkus:dev
 
-You can create a native executable using: 
-```shell script
-./mvnw package -Dnative
+# The application will be available at:
+# - Main app: http://localhost:8080
+# - OpenAPI spec: http://localhost:8080/openapi
+# - Swagger UI: http://localhost:8080/swagger-ui
+# - Health check: http://localhost:8080/health
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: 
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
+## Development
+
+### Database Operations
+
+```bash
+# Run Flyway migrations manually
+mvn flyway:migrate
+
+# Generate jOOQ classes (after database is running)
+mvn generate-sources
+
+# Reset database
+mvn flyway:clean flyway:migrate
 ```
 
-You can then execute your native executable with: `./target/knowledge-manager-1.0.0-SNAPSHOT-runner`
+### API Documentation
 
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.
+- OpenAPI specification: `http://localhost:8080/openapi`
+- Swagger UI: `http://localhost:8080/swagger-ui`
 
-## Related Guides
+### Frontend Development
 
-- REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
-- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
-- SmallRye Health ([guide](https://quarkus.io/guides/smallrye-health)): Monitor service health
-- Hibernate Validator ([guide](https://quarkus.io/guides/validation)): Validate object properties (field, getter) and method parameters for your beans (REST, CDI, Jakarta Persistence)
-- Flyway ([guide](https://quarkus.io/guides/flyway)): Handle your database schema migrations
-- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes with Swagger UI
-- JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
-- Micrometer metrics ([guide](https://quarkus.io/guides/micrometer)): Instrument the runtime and your application with dimensional metrics using Micrometer.
+The Preact application should be built and placed in `src/main/resources/META-INF/resources/`.
 
-## Provided Code
+```bash
+# Example workflow for Preact app
+cd frontend  # Your Preact project directory
+npm run build
+cp -r dist/* ../src/main/resources/META-INF/resources/
+```
 
-### REST
+## Project Structure
 
-Easily start your REST Web Services
+```
+knowledge-manager/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── tech/lacambra/kmanager/
+│   │   │       ├── config/           # Configuration classes
+│   │   │       ├── resource/         # REST endpoints
+│   │   │       └── generated/        # jOOQ generated classes
+│   │   └── resources/
+│   │       ├── META-INF/resources/   # Static files (Preact app)
+│   │       ├── db/migration/         # Flyway migrations
+│   │       └── application.properties
+│   └── test/
+├── docker-compose.yml
+├── pom.xml
+└── README.md
+```
 
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+## Configuration
 
-### SmallRye Health
+### Database Configuration
 
-Monitor your application's health using SmallRye Health
+The application uses environment variables for configuration. Copy the template and modify as needed:
 
-[Related guide section...](https://quarkus.io/guides/smallrye-health)
+```bash
+cp .env.backend.example .env.backend
+```
+
+Key environment variables in `.env.backend`:
+```properties
+POSTGRES_USER=kmuser
+POSTGRES_PASSWORD=your-secure-password
+POSTGRES_PORT=5432
+POSTGRES_DATA=postgres_data
+DATABASE_URL=jdbc:postgresql://localhost:5432/knowledge_manager
+LOG_LEVEL=INFO
+CORS_ORIGINS=http://localhost:3000,http://localhost:8080,https://knowledge-manager.lacambra.tech
+```
+
+The application.properties file uses these environment variables with sensible defaults.
+
+### Vector Search
+
+The application includes pgvector support for AI/ML applications:
+
+- Vector similarity search
+- Embedding storage (1536 dimensions for OpenAI)
+- Metadata indexing with JSONB
+
+### jOOQ Code Generation
+
+Configure database connection in `pom.xml` jOOQ plugin section, then:
+
+```bash
+mvn generate-sources
+```
+
+## API Endpoints
+
+- `GET /api/documents` - List all documents
+- `GET /api/documents/{id}` - Get document by ID
+- `POST /api/documents` - Create new document
+- `POST /api/documents/search` - Vector similarity search
+
+## Production Build
+
+```bash
+# Build JAR
+mvn clean package
+
+# Build native executable
+mvn package -Pnative
+
+# Run JAR
+java -jar target/quarkus-app/quarkus-run.jar
+```
+
+## Docker Deployment
+
+```bash
+# Build image
+docker build -t knowledge-manager .
+
+# Run with docker-compose
+docker-compose up
+```
+
+## Testing
+
+```bash
+# Run tests
+mvn test
+
+# Run integration tests
+mvn verify
+```
+
+## Monitoring
+
+- Health checks: `http://localhost:8080/health`
+- Metrics: `http://localhost:8080/metrics`
+- Prometheus metrics: `http://localhost:8080/metrics/prometheus`
