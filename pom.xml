@@ -106,6 +106,12 @@
       <version>0.1.6</version>
     </dependency>
 
+    <!-- OpenApi -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-openapi</artifactId>
+    </dependency>
+
     <!-- AI -->
     <dependency>
       <groupId>com.microsoft.onnxruntime</groupId>
