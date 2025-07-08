@@ -36,7 +36,7 @@ public class EmbeddingService {
             session = env.createSession(modelPath + "/model.onnx", opts);
 
             // Load tokenizer
-            tokenizer = HuggingFaceTokenizer.newInstance(Paths.get(modelPath + "/tokenizer.json"));
+            tokenizer = HuggingFaceTokenizer.newInstance(Paths.get(modelPath + "/../tokenizer.json"));
 
             LOGGER.info("Embedding service initialized successfully");
         } catch (Exception e) {
@@ -55,10 +55,16 @@ public class EmbeddingService {
             long[] inputIds = encoding.getIds();
             long[] attentionMask = encoding.getAttentionMask();
 
+            // Create token_type_ids (all zeros for single sentence)
+            long[] tokenTypeIds = new long[inputIds.length];
+            // Arrays are initialized with zeros by default in Java, but being explicit:
+            java.util.Arrays.fill(tokenTypeIds, 0L);
+
             // Prepare input tensors
             Map<String, OnnxTensor> inputs = new HashMap<>();
             inputs.put("input_ids", OnnxTensor.createTensor(env, new long[][] { inputIds }));
             inputs.put("attention_mask", OnnxTensor.createTensor(env, new long[][] { attentionMask }));
+            inputs.put("token_type_ids", OnnxTensor.createTensor(env, new long[][] { tokenTypeIds })); 
 
             // Run inference
             try (OrtSession.Result result = session.run(inputs)) {
