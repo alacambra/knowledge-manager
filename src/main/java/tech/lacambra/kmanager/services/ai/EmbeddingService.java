@@ -1,4 +1,4 @@
-package tech.lacambra.kmanager.ai;
+package tech.lacambra.kmanager.services.ai;
 
 import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;

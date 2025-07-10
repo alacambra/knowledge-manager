@@ -106,6 +106,12 @@
       <version>0.1.6</version>
     </dependency>
 
+    <dependency>
+      <groupId>io.quarkiverse.minio</groupId>
+      <artifactId>quarkus-minio</artifactId>
+      <version>2.9.3</version>
+    </dependency>
+
     <!-- OpenApi -->
     <dependency>
       <groupId>io.quarkus</groupId>

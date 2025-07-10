@@ -13,8 +13,9 @@ import org.jooq.JSONB;
 import org.jooq.Param;
 import org.jooq.impl.DSL;
 
-import tech.lacambra.kmanager.ai.EmbeddingService;
 import tech.lacambra.kmanager.generated.jooq.tables.pojos.Documents;
+import tech.lacambra.kmanager.services.ai.EmbeddingService;
+
 import static tech.lacambra.kmanager.generated.jooq.tables.Documents.*;
 
 @ApplicationScoped

@@ -1,4 +1,4 @@
-package tech.lacambra.kmanager.ai;
+package tech.lacambra.kmanager.services.ai;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
