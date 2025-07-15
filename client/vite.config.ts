@@ -8,5 +8,14 @@ export default defineConfig({
       "react": "preact/compat",
       "react-dom": "preact/compat"
     }
+  },
+  build: {
+    sourcemap: true,
+  },
+  esbuild: {
+    sourcemap: true,
+  },
+  css: {
+    devSourcemap: true,
   }
 })

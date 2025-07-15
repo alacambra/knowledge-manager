@@ -17,6 +17,30 @@
             "hostName": "localhost",
             "port": 5005
         },
+        {
+            "name": "Launch Chrome",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/client/src",
+            "sourceMaps": true,
+            "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-userdatadir",
+            "sourceMapPathOverrides": {
+                "webpack:///./src/*": "${workspaceFolder}/client/src/*",
+                "webpack:///src/*": "${workspaceFolder}/client/src/*",
+                "webpack:///*": "${workspaceFolder}/client/*"
+            },
+            "skipFiles": [
+                "<node_internals>/**",
+                "node_modules/**"
+            ]
+        },
+        {
+            "name": "Attach to Chrome",
+            "port": 9222,
+            "request": "attach",
+            "type": "chrome",
+            "webRoot": "${workspaceFolder}/client/src"
+        }
     ]
 }
-
