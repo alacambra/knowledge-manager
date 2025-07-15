@@ -4,7 +4,9 @@ import { LocationProvider, Router, Route } from 'preact-iso';
 import { Header } from './components/Header.jsx';
 import { Home } from './pages/Home/index.jsx';
 import { NotFound } from './pages/_404.jsx';
+import { WorkInProgress } from './pages/WorkInProgress.tsx';
 import './style.css';
+import 'antd/dist/reset.css';
 
 export function App() {
 	return (
@@ -13,6 +15,8 @@ export function App() {
 			<main>
 				<Router>
 					<Route path="/" component={Home} />
+					<Route path="/edit/:id" component={WorkInProgress} />
+					<Route path="/create" component={WorkInProgress} />
 					<Route default component={NotFound} />
 				</Router>
 			</main>
