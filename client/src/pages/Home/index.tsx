@@ -1,4 +1,4 @@
-import { KnowledgeUnitList } from '../../components/KnowledgeUnitList.tsx';
+import { KnowledgeUnitList } from '../../components/KnowledgeUnitList';
 
 export function Home() {
 	return <KnowledgeUnitList />;

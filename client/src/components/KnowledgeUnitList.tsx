@@ -1,51 +1,49 @@
-import { useState } from 'preact/hooks';
+import { useState, useEffect } from 'preact/hooks';
 import { Button, List, Space, Typography, Modal, Input, message } from 'antd';
 import { EditOutlined, DeleteOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons';
 import { useLocation } from 'preact-iso';
+import { KnowledgeUnitRepository, KnowledgeUnit } from '../repositories/knowledge.unit.repository';
 
 const { Title } = Typography;
 
-interface KnowledgeUnit {
-  id: string;
-  name: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export function KnowledgeUnitList() {
   const location = useLocation();
-  const [knowledgeUnits, setKnowledgeUnits] = useState<KnowledgeUnit[]>([
-    {
-      id: '1',
-      name: 'Payment Processing Workflow',
-      description: 'Complete workflow for processing customer payments including validation, authorization, and settlement',
-      createdAt: '2023-12-01',
-      updatedAt: '2023-12-01'
-    },
-    {
-      id: '2',
-      name: 'User Authentication System',
-      description: 'Authentication and authorization system architecture with JWT tokens and role-based access control',
-      createdAt: '2023-12-02',
-      updatedAt: '2023-12-02'
-    },
-    {
-      id: '3',
-      name: 'Deployment Pipeline',
-      description: 'CI/CD pipeline configuration for automated testing, building, and deployment to production',
-      createdAt: '2023-12-03',
-      updatedAt: '2023-12-03'
+  const [knowledgeUnits, setKnowledgeUnits] = useState<KnowledgeUnit[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadKnowledgeUnits = async () => {
+    try {
+      setLoading(true);
+      const units = await KnowledgeUnitRepository.listKnowledgeUnits();
+      setKnowledgeUnits(units);
+    } catch (error) {
+      message.error('Failed to load knowledge units');
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
+
+  useEffect(() => {
+    loadKnowledgeUnits();
+  }, []);
 
   const handleDelete = (id: string) => {
     Modal.confirm({
       title: 'Are you sure you want to delete this knowledge unit?',
       content: 'This action cannot be undone.',
-      onOk() {
-        setKnowledgeUnits(prev => prev.filter(ku => ku.id !== id));
-        message.success('Knowledge unit deleted successfully');
+      async onOk() {
+        try {
+          const success = await KnowledgeUnitRepository.deleteKnowledgeUnit(id);
+          if (success) {
+            setKnowledgeUnits(prev => prev.filter(ku => ku.id !== id));
+            message.success('Knowledge unit deleted successfully');
+          } else {
+            message.error('Failed to delete knowledge unit');
+          }
+        } catch (error) {
+          message.error('Failed to delete knowledge unit');
+        }
       },
     });
   };
@@ -84,6 +82,7 @@ export function KnowledgeUnitList() {
       </div>
 
       <List
+        loading={loading}
         dataSource={knowledgeUnits}
         renderItem={(item) => (
           <List.Item style={{ marginBottom: '8px' }}>

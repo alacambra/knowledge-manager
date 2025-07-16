@@ -30,7 +30,7 @@ import { ConfigProvider } from 'antd';
 import { Header } from './components/Header.jsx';
 import { Home } from './pages/Home/index.jsx';
 import { NotFound } from './pages/_404.jsx';
-import { WorkInProgress } from './pages/WorkInProgress.tsx';
+import { WorkInProgress } from './pages/WorkInProgress';
 import './style.css';
 import 'antd/dist/reset.css';
 
