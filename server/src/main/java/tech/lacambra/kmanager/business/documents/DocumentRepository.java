@@ -1,7 +1,8 @@
-package tech.lacambra.kmanager.documents;
+package tech.lacambra.kmanager.business.documents;
 
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import jakarta.inject.Inject;
@@ -13,10 +14,10 @@ import org.jooq.JSONB;
 import org.jooq.Param;
 import org.jooq.impl.DSL;
 
-import tech.lacambra.kmanager.generated.jooq.tables.pojos.Documents;
+import tech.lacambra.kmanager.generated.jooq.tables.pojos.Document;
 import tech.lacambra.kmanager.services.ai.EmbeddingService;
 
-import static tech.lacambra.kmanager.generated.jooq.tables.Documents.*;
+import static tech.lacambra.kmanager.generated.jooq.tables.Document.*;
 
 @ApplicationScoped
 @Transactional
@@ -61,9 +62,9 @@ public class DocumentRepository {
         this.embeddingService = embeddingService;
     }
 
-    public List<Documents> getAllDocuments() {
-        return dsl.selectFrom(DOCUMENTS)
-                .fetchInto(Documents.class);
+    public List<Document> getAllDocuments() {
+        return dsl.selectFrom(DOCUMENT)
+                .fetchInto(Document.class);
     }
 
     /**
@@ -74,7 +75,7 @@ public class DocumentRepository {
      *                   text.
      * @return The created document
      */
-    public Documents createRandomDocumentWithEmbedding(String customText) {
+    public Document createRandomDocumentWithEmbedding(String customText) {
         String title = SAMPLE_TITLES[random.nextInt(SAMPLE_TITLES.length)];
         String content = customText != null ? customText : SAMPLE_CONTENTS[random.nextInt(SAMPLE_CONTENTS.length)];
 
@@ -102,11 +103,11 @@ public class DocumentRepository {
             var doc = createDocument(title, content, sqlVector);
 
             // // Insert document into database
-            // DocumentsRecord record = dsl.insertInto(DOCUMENTS)
-            // .set(DOCUMENTS.TITLE, title)
-            // .set(DOCUMENTS.CONTENT, content)
-            // .set(DOCUMENTS.EMBEDDING, convertEmbeddingToSqlArray(embedding))
-            // .set(DOCUMENTS.METADATA, metadata)
+            // DocumentsRecord record = dsl.insertInto(DOCUMENT)
+            // .set(DOCUMENT.TITLE, title)
+            // .set(DOCUMENT.CONTENT, content)
+            // .set(DOCUMENT.EMBEDDING, convertEmbeddingToSqlArray(embedding))
+            // .set(DOCUMENT.METADATA, metadata)
             // .returning()
             // .fetchOne();
 
@@ -118,7 +119,7 @@ public class DocumentRepository {
             // ", embedding dimension: " + embedding.length);
 
             // Convert record to POJO
-            // Documents document = new Documents();
+            // Document document = new Document();
             // document.setId(record.getId());
             // document.setTitle(record.getTitle());
             // document.setContent(record.getContent());
@@ -148,14 +149,14 @@ public class DocumentRepository {
         return DSL.inline(vectorString);
     }
 
-    public Documents createDocument(String title, String content, Param<String> sqlVector) {
+    public Document createDocument(String title, String content, Param<String> sqlVector) {
         try {
 
-            Documents doc = dsl
-                    .insertInto(DOCUMENTS, DOCUMENTS.TITLE, DOCUMENTS.CONTENT, DOCUMENTS.EMBEDDING, DOCUMENTS.METADATA)
+            Document doc = dsl
+                    .insertInto(DOCUMENT, DOCUMENT.TITLE, DOCUMENT.CONTENT, DOCUMENT.EMBEDDING, DOCUMENT.METADATA)
                     .values(title, content, DSL.field("{0}::vector", sqlVector), JSONB.valueOf("{}"))
                     .returning()
-                    .fetchOneInto(Documents.class);
+                    .fetchOneInto(Document.class);
 
             LOGGER.info("Document created successfully with embedding:" + doc.getId());
 
@@ -172,7 +173,7 @@ public class DocumentRepository {
      * 
      * @return The created document
      */
-    public Documents createRandomDocumentWithEmbedding() {
+    public Document createRandomDocumentWithEmbedding() {
         return createRandomDocumentWithEmbedding(null);
     }
 
@@ -182,10 +183,10 @@ public class DocumentRepository {
      * @param id Document ID
      * @return Document if found, null otherwise
      */
-    public Documents findById(Long id) {
-        return dsl.selectFrom(DOCUMENTS)
-                .where(DOCUMENTS.ID.eq(id))
-                .fetchOneInto(Documents.class);
+    public Document findById(UUID id) {
+        return dsl.selectFrom(DOCUMENT)
+                .where(DOCUMENT.ID.eq(id))
+                .fetchOneInto(Document.class);
     }
 
     /**
@@ -195,7 +196,7 @@ public class DocumentRepository {
      */
     public int getDocumentCount() {
         return dsl.selectCount()
-                .from(DOCUMENTS)
+                .from(DOCUMENT)
                 .fetchOne(0, int.class);
     }
 
@@ -204,15 +205,15 @@ public class DocumentRepository {
 
         return dsl
                 .select(
-                        DOCUMENTS.ID,
-                        DOCUMENTS.TITLE,
-                        DOCUMENTS.CONTENT,
-                        // DOCUMENTS.METADATA,
-                        DOCUMENTS.CREATED_AT,
-                        DOCUMENTS.UPDATED_AT)
+                        DOCUMENT.ID,
+                        DOCUMENT.TITLE,
+                        DOCUMENT.CONTENT,
+                        // DOCUMENT.METADATA,
+                        DOCUMENT.CREATED_AT,
+                        DOCUMENT.UPDATED_AT)
                 .select(DSL.field("embedding <=> {0}::vector", Double.class, vectorString)
                         .as("similarity_score"))
-                .from(DOCUMENTS)
+                .from(DOCUMENT)
                 .where(DSL.field("embedding <=> {0}::vector", vectorString).lessThan(1.5))
                 .orderBy(DSL.field("embedding <=> {0}::vector", vectorString))
                 .limit(limit)

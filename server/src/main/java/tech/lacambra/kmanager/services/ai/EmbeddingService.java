@@ -6,6 +6,8 @@ import ai.onnxruntime.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.nio.file.Paths;
@@ -18,12 +20,17 @@ public class EmbeddingService {
 
     private static final Logger LOGGER = Logger.getLogger(EmbeddingService.class.getName());
 
-    @ConfigProperty(name = "embedding.model.path")
+    // @ConfigProperty(name = "embedding.model.path")
     String modelPath;
 
     private OrtSession session;
     private HuggingFaceTokenizer tokenizer;
     private OrtEnvironment env;
+
+    @Inject
+    public EmbeddingService(@ConfigProperty(name = "embedding.model.path") String modelPath) {
+        this.modelPath = modelPath;
+    }
 
     @PostConstruct
     public void init() {
@@ -64,7 +71,7 @@ public class EmbeddingService {
             Map<String, OnnxTensor> inputs = new HashMap<>();
             inputs.put("input_ids", OnnxTensor.createTensor(env, new long[][] { inputIds }));
             inputs.put("attention_mask", OnnxTensor.createTensor(env, new long[][] { attentionMask }));
-            inputs.put("token_type_ids", OnnxTensor.createTensor(env, new long[][] { tokenTypeIds })); 
+            inputs.put("token_type_ids", OnnxTensor.createTensor(env, new long[][] { tokenTypeIds }));
 
             // Run inference
             try (OrtSession.Result result = session.run(inputs)) {

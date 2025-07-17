@@ -1,8 +1,8 @@
-package tech.lacambra.kmanager.documents;
+package tech.lacambra.kmanager.business.documents;
 
-import tech.lacambra.kmanager.generated.jooq.tables.pojos.Documents;
+import tech.lacambra.kmanager.generated.jooq.tables.pojos.Document;
 
-public class DocumentResult extends Documents {
+public class DocumentResult extends Document {
     private Double similarityScore;
     
     public DocumentResult() {

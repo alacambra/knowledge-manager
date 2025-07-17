@@ -4,11 +4,12 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import tech.lacambra.kmanager.documents.DocumentRepository;
-import tech.lacambra.kmanager.generated.jooq.tables.pojos.Documents;
+import tech.lacambra.kmanager.business.documents.DocumentRepository;
+import tech.lacambra.kmanager.generated.jooq.tables.pojos.Document;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -47,7 +48,7 @@ public class HelloAIResource {
         LOGGER.info("Creating random document with embeddings");
 
         try {
-            Documents document = documentRepository.createRandomDocumentWithEmbedding();
+            Document document = documentRepository.createRandomDocumentWithEmbedding();
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -91,7 +92,7 @@ public class HelloAIResource {
                 request.text.substring(0, Math.min(50, request.text.length())) + "...");
 
         try {
-            Documents document = documentRepository.createRandomDocumentWithEmbedding(request.text);
+            Document document = documentRepository.createRandomDocumentWithEmbedding(request.text);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -171,11 +172,11 @@ public class HelloAIResource {
      */
     @GET
     @Path("/documents/{id}")
-    public Response getDocument(@PathParam("id") Long id) {
+    public Response getDocument(@PathParam("id") UUID id) {
         LOGGER.info("Retrieving document with ID: " + id);
 
         try {
-            Documents document = documentRepository.findById(id);
+            Document document = documentRepository.findById(id);
 
             if (document == null) {
                 Map<String, Object> errorResponse = new HashMap<>();
@@ -257,7 +258,7 @@ public class HelloAIResource {
     /**
      * Creates a summary of a document without the full embedding data.
      */
-    private Map<String, Object> createDocumentSummary(Documents document) {
+    private Map<String, Object> createDocumentSummary(Document document) {
         Map<String, Object> summary = new HashMap<>();
         summary.put("id", document.getId());
         summary.put("title", document.getTitle());
@@ -273,7 +274,7 @@ public class HelloAIResource {
     /**
      * Creates a detailed summary of a document including metadata.
      */
-    private Map<String, Object> createDetailedDocumentSummary(Documents document) {
+    private Map<String, Object> createDetailedDocumentSummary(Document document) {
         Map<String, Object> summary = createDocumentSummary(document);
         summary.put("fullContent", document.getContent());
         summary.put("metadata", document.getMetadata());
