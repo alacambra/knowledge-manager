@@ -4,7 +4,7 @@
 package tech.lacambra.kmanager.generated.jooq.tables;
 
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -67,12 +67,12 @@ public class KnowledgeUnit extends TableImpl<KnowledgeUnitRecord> {
     /**
      * The column <code>public.knowledge_unit.created_at</code>.
      */
-    public final TableField<KnowledgeUnitRecord, OffsetDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
+    public final TableField<KnowledgeUnitRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "");
 
     /**
      * The column <code>public.knowledge_unit.updated_at</code>.
      */
-    public final TableField<KnowledgeUnitRecord, OffsetDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
+    public final TableField<KnowledgeUnitRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "");
 
     private KnowledgeUnit(Name alias, Table<KnowledgeUnitRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

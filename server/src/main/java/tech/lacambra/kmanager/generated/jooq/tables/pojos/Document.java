@@ -5,10 +5,9 @@ package tech.lacambra.kmanager.generated.jooq.tables.pojos;
 
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.jooq.JSONB;
@@ -27,8 +26,8 @@ public class Document implements Serializable {
     private String content;
     private Object embedding;
     private JSONB metadata;
-    private OffsetDateTime createdAt;
-    private OffsetDateTime updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public Document() {}
 
@@ -48,8 +47,8 @@ public class Document implements Serializable {
         String content,
         Object embedding,
         JSONB metadata,
-        OffsetDateTime createdAt,
-        OffsetDateTime updatedAt
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
     ) {
         this.id = id;
         this.title = title;
@@ -78,7 +77,6 @@ public class Document implements Serializable {
      * Getter for <code>public.document.title</code>.
      */
     @NotNull
-    @Size(max = 255)
     public String getTitle() {
         return this.title;
     }
@@ -148,28 +146,28 @@ public class Document implements Serializable {
     /**
      * Getter for <code>public.document.created_at</code>.
      */
-    public OffsetDateTime getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return this.createdAt;
     }
 
     /**
      * Setter for <code>public.document.created_at</code>.
      */
-    public void setCreatedAt(OffsetDateTime createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
     /**
      * Getter for <code>public.document.updated_at</code>.
      */
-    public OffsetDateTime getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return this.updatedAt;
     }
 
     /**
      * Setter for <code>public.document.updated_at</code>.
      */
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 

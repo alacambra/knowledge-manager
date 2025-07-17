@@ -13,7 +13,9 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SchemaImpl;
 
 import tech.lacambra.kmanager.generated.jooq.tables.Document;
+import tech.lacambra.kmanager.generated.jooq.tables.DocumentTemplates;
 import tech.lacambra.kmanager.generated.jooq.tables.KnowledgeUnit;
+import tech.lacambra.kmanager.generated.jooq.tables.KnowledgeUnitDocument;
 
 
 /**
@@ -46,7 +48,9 @@ public class Public extends SchemaImpl {
     public final List<Table<?>> getTables() {
         return Arrays.asList(
             Document.DOCUMENT,
-            KnowledgeUnit.KNOWLEDGE_UNIT
+            DocumentTemplates.DOCUMENT_TEMPLATES,
+            KnowledgeUnit.KNOWLEDGE_UNIT,
+            KnowledgeUnitDocument.KNOWLEDGE_UNIT_DOCUMENT
         );
     }
 }

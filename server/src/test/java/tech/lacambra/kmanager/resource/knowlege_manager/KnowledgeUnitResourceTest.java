@@ -26,7 +26,17 @@ class KnowledgeUnitResourceTest {
     .body("""
       {
           "name": "%s",
-          "description": "%s"
+          "description": "%s",
+          "documents": [
+              {
+                  "name": "Sample Document 1",
+                  "content": "This is the content of the first document"
+              },
+              {
+                  "name": "Sample Document 2",
+                  "content": "This is the content of the second document"
+              }
+          ]
       }
       """.formatted(name, description))
     .when().post("/knowledge-units")

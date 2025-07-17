@@ -8,8 +8,8 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import tech.lacambra.kmanager.business.knowledge_unit.KnowledgeUnitRequest;
-import tech.lacambra.kmanager.business.knowledge_unit.knowledgeUnitRepository;
+import tech.lacambra.kmanager.business.knowledge_unit.KnowledgeUnitRepository;
+import tech.lacambra.kmanager.business.knowledge_unit.KnowledgeUnitService;
 import tech.lacambra.kmanager.generated.jooq.tables.pojos.KnowledgeUnit;
 
 import java.util.List;
@@ -21,11 +21,14 @@ import java.util.UUID;
 public class KnowledgeUnitResource {
     
     @Inject
-    knowledgeUnitRepository repository;
+    KnowledgeUnitService service;
+    
+    @Inject
+    KnowledgeUnitRepository repository;
     
     @POST
     public Response createKnowledgeUnit(KnowledgeUnitRequest request) {
-        UUID id = repository.create(request);
+        UUID id = service.createKnowledgeUnit(request);
         return Response.status(Response.Status.CREATED)
                 .entity(id)
                 .build();

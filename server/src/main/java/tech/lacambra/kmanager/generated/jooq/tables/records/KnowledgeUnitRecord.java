@@ -7,7 +7,7 @@ package tech.lacambra.kmanager.generated.jooq.tables.records;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.jooq.impl.TableRecordImpl;
@@ -70,29 +70,29 @@ public class KnowledgeUnitRecord extends TableRecordImpl<KnowledgeUnitRecord> {
     /**
      * Setter for <code>public.knowledge_unit.created_at</code>.
      */
-    public void setCreatedAt(OffsetDateTime value) {
+    public void setCreatedAt(LocalDateTime value) {
         set(3, value);
     }
 
     /**
      * Getter for <code>public.knowledge_unit.created_at</code>.
      */
-    public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(3);
+    public LocalDateTime getCreatedAt() {
+        return (LocalDateTime) get(3);
     }
 
     /**
      * Setter for <code>public.knowledge_unit.updated_at</code>.
      */
-    public void setUpdatedAt(OffsetDateTime value) {
+    public void setUpdatedAt(LocalDateTime value) {
         set(4, value);
     }
 
     /**
      * Getter for <code>public.knowledge_unit.updated_at</code>.
      */
-    public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(4);
+    public LocalDateTime getUpdatedAt() {
+        return (LocalDateTime) get(4);
     }
 
     // -------------------------------------------------------------------------
@@ -109,7 +109,7 @@ public class KnowledgeUnitRecord extends TableRecordImpl<KnowledgeUnitRecord> {
     /**
      * Create a detached, initialised KnowledgeUnitRecord
      */
-    public KnowledgeUnitRecord(UUID id, String name, String description, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public KnowledgeUnitRecord(UUID id, String name, String description, LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(KnowledgeUnit.KNOWLEDGE_UNIT);
 
         setId(id);

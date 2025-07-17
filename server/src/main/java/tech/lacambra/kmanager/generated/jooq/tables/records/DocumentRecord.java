@@ -5,9 +5,8 @@ package tech.lacambra.kmanager.generated.jooq.tables.records;
 
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.jooq.JSONB;
@@ -49,7 +48,6 @@ public class DocumentRecord extends TableRecordImpl<DocumentRecord> {
      * Getter for <code>public.document.title</code>.
      */
     @NotNull
-    @Size(max = 255)
     public String getTitle() {
         return (String) get(1);
     }
@@ -112,29 +110,29 @@ public class DocumentRecord extends TableRecordImpl<DocumentRecord> {
     /**
      * Setter for <code>public.document.created_at</code>.
      */
-    public void setCreatedAt(OffsetDateTime value) {
+    public void setCreatedAt(LocalDateTime value) {
         set(5, value);
     }
 
     /**
      * Getter for <code>public.document.created_at</code>.
      */
-    public OffsetDateTime getCreatedAt() {
-        return (OffsetDateTime) get(5);
+    public LocalDateTime getCreatedAt() {
+        return (LocalDateTime) get(5);
     }
 
     /**
      * Setter for <code>public.document.updated_at</code>.
      */
-    public void setUpdatedAt(OffsetDateTime value) {
+    public void setUpdatedAt(LocalDateTime value) {
         set(6, value);
     }
 
     /**
      * Getter for <code>public.document.updated_at</code>.
      */
-    public OffsetDateTime getUpdatedAt() {
-        return (OffsetDateTime) get(6);
+    public LocalDateTime getUpdatedAt() {
+        return (LocalDateTime) get(6);
     }
 
     // -------------------------------------------------------------------------
@@ -151,7 +149,7 @@ public class DocumentRecord extends TableRecordImpl<DocumentRecord> {
     /**
      * Create a detached, initialised DocumentRecord
      */
-    public DocumentRecord(UUID id, String title, String content, Object embedding, JSONB metadata, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public DocumentRecord(UUID id, String title, String content, Object embedding, JSONB metadata, LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(Document.DOCUMENT);
 
         setId(id);

@@ -4,7 +4,7 @@
 package tech.lacambra.kmanager.generated.jooq.tables;
 
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -59,7 +59,7 @@ public class Document extends TableImpl<DocumentRecord> {
     /**
      * The column <code>public.document.title</code>.
      */
-    public final TableField<DocumentRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.VARCHAR(255).nullable(false), this, "");
+    public final TableField<DocumentRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * The column <code>public.document.content</code>.
@@ -85,12 +85,12 @@ public class Document extends TableImpl<DocumentRecord> {
     /**
      * The column <code>public.document.created_at</code>.
      */
-    public final TableField<DocumentRecord, OffsetDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
+    public final TableField<DocumentRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "");
 
     /**
      * The column <code>public.document.updated_at</code>.
      */
-    public final TableField<DocumentRecord, OffsetDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "");
+    public final TableField<DocumentRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "");
 
     private Document(Name alias, Table<DocumentRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
