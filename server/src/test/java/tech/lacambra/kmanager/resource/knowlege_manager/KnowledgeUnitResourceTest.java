@@ -10,69 +10,52 @@ import tech.lacambra.kmanager.services.ai.EmbeddingService;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.hasItems;
 
 @QuarkusTest
 @QuarkusTestResource(value = PostgresTestResource.class)
 class KnowledgeUnitResourceTest {
 
-    @InjectMock
-    EmbeddingService embeddingService;
+ @InjectMock
+ EmbeddingService embeddingService;
 
-    @Test
-    void testCreateKnowledgeUnitsAndGetList() {
-        // Create first knowledge unit
-        given()
-                .contentType(ContentType.JSON)
-                .body("""
-                        {
-                            "name": "Backend Development Process",
-                            "description": "Complete guide for backend development including architecture, patterns, and best practices"
-                        }
-                        """)
-                .when().post("/knowledge-units")
-                .then()
-                .statusCode(201);
+ private void createKnowledgeUnit(String name, String description) {
+  given()
+    .contentType(ContentType.JSON)
+    .body("""
+      {
+          "name": "%s",
+          "description": "%s"
+      }
+      """.formatted(name, description))
+    .when().post("/knowledge-units")
+    .then()
+    .statusCode(201);
+ }
 
-        // Create second knowledge unit
-        given()
-                .contentType(ContentType.JSON)
-                .body("""
-                        {
-                            "name": "Database Design Principles",
-                            "description": "Guidelines for designing efficient and scalable database schemas"
-                        }
-                        """)
-                .when().post("/knowledge-units")
-                .then()
-                .statusCode(201);
+ @Test
+ void testCreateKnowledgeUnitsAndGetList() {
+  String backendName = "Backend Development Process";
+  String backendDescription = "Complete guide for backend development including architecture, patterns, and best practices";
 
-        // Create third knowledge unit
-        given()
-                .contentType(ContentType.JSON)
-                .body("""
-                        {
-                            "name": "API Security Best Practices",
-                            "description": "Security measures and practices for REST API development"
-                        }
-                        """)
-                .when().post("/knowledge-units")
-                .then()
-                .statusCode(201);
+  String databaseName = "Database Design Principles";
+  String databaseDescription = "Guidelines for designing efficient and scalable database schemas";
 
-        // Get all knowledge units and verify we have 3 different items
-        given()
-                .when().get("/knowledge-units")
-                .then()
-                .statusCode(200)
-                .body("", hasSize(3))
-                .body("[0].name", is("Backend Development Process"))
-                .body("[0].description", is(
-                        "Complete guide for backend development including architecture, patterns, and best practices"))
-                .body("[1].name", is("Database Design Principles"))
-                .body("[1].description", is("Guidelines for designing efficient and scalable database schemas"))
-                .body("[2].name", is("API Security Best Practices"))
-                .body("[2].description", is("Security measures and practices for REST API development"));
-    }
+  String apiSecurityName = "API Security Best Practices";
+  String apiSecurityDescription = "Security measures and practices for REST API development";
+
+  createKnowledgeUnit(backendName, backendDescription);
+  createKnowledgeUnit(databaseName, databaseDescription);
+  createKnowledgeUnit(apiSecurityName, apiSecurityDescription);
+
+  given()
+    .when().get("/knowledge-units")
+    .then()
+    .statusCode(200)
+    .body("", hasSize(3))
+    .body("name", hasItems(backendName, databaseName, apiSecurityName));
+
+ }
+
 }

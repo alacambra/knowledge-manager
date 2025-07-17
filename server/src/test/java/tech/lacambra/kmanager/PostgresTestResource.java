@@ -2,6 +2,7 @@ package tech.lacambra.kmanager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -11,6 +12,8 @@ import org.testcontainers.utility.DockerImageName;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
 public class PostgresTestResource implements QuarkusTestResourceLifecycleManager {
+    private static final Logger LOGGER = Logger.getLogger(PostgresTestResource.class.getName());
+    
     // Configuration property keys
     private static final String USE_EXTERNAL_DB_PROP = "tech.lacambra.kmanager.useExternalDb";
     private static final String EXTERNAL_DB_URL_PROP = "tech.lacambra.kmanager.externalDb.url";
@@ -58,6 +61,8 @@ public class PostgresTestResource implements QuarkusTestResourceLifecycleManager
             config.put("quarkus.datasource.password", externalPassword);
         } else {
             // Use Testcontainers PostgreSQL with pgvector
+            LOGGER.info("Starting PostgreSQL testcontainer with pgvector...");
+            
             database = new PostgreSQLContainer<>(pgvectorImage)
                     .withDatabaseName(DEFAULT_DB_NAME)
                     .withUsername(DEFAULT_USERNAME)
@@ -67,10 +72,23 @@ public class PostgresTestResource implements QuarkusTestResourceLifecycleManager
 
             database.start();
 
+            LOGGER.info("PostgreSQL testcontainer started successfully! Container ID: " + database.getContainerId() + 
+                       ", JDBC URL: " + database.getJdbcUrl() + 
+                       ", Username: " + database.getUsername() + 
+                       ", Database: " + database.getDatabaseName() + 
+                       ", Host: " + database.getHost() + ":" + database.getFirstMappedPort());
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
             config.put("quarkus.datasource.jdbc.url", database.getJdbcUrl());
             config.put("quarkus.datasource.username", database.getUsername());
             config.put("quarkus.datasource.password", database.getPassword());
         }
+
 
         return config;
     }
