@@ -1,0 +1,182 @@
+---
+openapi: 3.1.0
+paths:
+  /hello:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+      summary: Hello
+      tags:
+      - Greeting Resource
+  /helloai:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+      summary: Hello
+      tags:
+      - Hello AI Resource
+  /helloai/create-random:
+    post:
+      responses:
+        "200":
+          description: OK
+      summary: Create Random Document
+      tags:
+      - Hello AI Resource
+  /helloai/create-with-text:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDocumentRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Create Document With Text
+      tags:
+      - Hello AI Resource
+  /helloai/documents:
+    get:
+      responses:
+        "200":
+          description: OK
+      summary: Get All Documents
+      tags:
+      - Hello AI Resource
+  /helloai/documents/{id}:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+      summary: Get Document
+      tags:
+      - Hello AI Resource
+  /helloai/search:
+    get:
+      parameters:
+      - name: q
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+      summary: Search Documents
+      tags:
+      - Hello AI Resource
+  /helloai/test-embedding:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDocumentRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Test Embedding
+      tags:
+      - Hello AI Resource
+  /knowledge-units:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KnowledgeUnit"
+      summary: Get Knowledge Units
+      tags:
+      - Knowledge Unit Resource
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KnowledgeUnitRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Create Knowledge Unit
+      tags:
+      - Knowledge Unit Resource
+components:
+  schemas:
+    CreateDocumentRequest:
+      type: object
+      properties:
+        text:
+          type: string
+    KnowledgeUnit:
+      type: object
+      required:
+      - name
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+    KnowledgeUnitRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    OffsetDateTime:
+      type: string
+      format: date-time
+      examples:
+      - 2022-03-10T12:15:50-04:00
+    UUID:
+      type: string
+      format: uuid
+      pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+info:
+  title: Knowledge Manager API
+  version: 1.0.0
+  description: "The Knowledge Manager API provides endpoints for managing knowledge\
+    \ units. A knowledge unit aggregates multi-dimensional information needed for\
+    \ specific tasks, enabling cross-domain information reuse and contextual knowledge\
+    \ assembly."
+servers:
+- url: http://localhost:8080
+  description: Auto generated value
+- url: http://0.0.0.0:8080
+  description: Auto generated value
