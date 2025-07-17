@@ -31,6 +31,7 @@ import { Header } from './components/Header.jsx';
 import { Home } from './pages/Home/index.jsx';
 import { NotFound } from './pages/_404.jsx';
 import { WorkInProgress } from './pages/WorkInProgress';
+import { KnowledgeUnitForm } from './components/KnowledgeUnitForm';
 import './style.css';
 import 'antd/dist/reset.css';
 
@@ -54,7 +55,7 @@ export function App() {
 						<Router>
 							<Route path="/" component={Home} />
 							<Route path="/edit/:id" component={WorkInProgress} />
-							<Route path="/create" component={WorkInProgress} />
+							<Route path="/create" component={KnowledgeUnitForm} />
 							<Route default component={NotFound} />
 						</Router>
 					</main>
