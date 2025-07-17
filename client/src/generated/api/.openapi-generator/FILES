@@ -1,0 +1,17 @@
+.gitignore
+.npmignore
+.openapi-generator-ignore
+README.md
+package.json
+src/apis/GreetingResourceApi.ts
+src/apis/HelloAIResourceApi.ts
+src/apis/KnowledgeUnitResourceApi.ts
+src/apis/index.ts
+src/index.ts
+src/models/CreateDocumentRequest.ts
+src/models/KnowledgeUnit.ts
+src/models/KnowledgeUnitRequest.ts
+src/models/index.ts
+src/runtime.ts
+tsconfig.esm.json
+tsconfig.json

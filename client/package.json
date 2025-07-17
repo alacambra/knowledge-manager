@@ -4,7 +4,8 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"generate-client": "npx @openapitools/openapi-generator-cli generate -i ../server/src/main/resources/META-INF/openapi.yaml -g typescript-fetch -o src/generated/api --additional-properties=typescriptThreePlus=true,supportsES6=true,npmName=knowledge-manager-api,npmVersion=1.0.0"
 	},
 	"dependencies": {
 		"@preact/compat": "^18.3.1",
@@ -13,6 +14,7 @@
 		"preact-iso": "^2.9.2"
 	},
 	"devDependencies": {
+		"@openapitools/openapi-generator-cli": "^2.21.2",
 		"@preact/preset-vite": "^2.9.3",
 		"eslint": "^8.57.1",
 		"eslint-config-preact": "^1.5.0",
