@@ -1,44 +1,33 @@
 import { useState } from 'preact/hooks';
-import { Button, Form, Input, Typography, message, Card } from 'antd';
-import { SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { useLocation } from 'preact-iso';
-import { KnowledgeUnitRepository2 } from '../repositories/knowledge.unit.repository2';
-import type { KnowledgeUnitRequest } from '../generated/api/src';
+import { Button, Form, Input, Typography, Card, List } from 'antd';
+import { SaveOutlined, ArrowLeftOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import type { KnowledgeUnitRequest, DocumentRequest } from '../api/models';
 
 const { Title } = Typography;
 const { TextArea } = Input;
 
-interface CreateKnowledgeUnitForm {
-  onSuccess?: () => void;
+interface KnowledgeUnitFormProps {
+  onSubmit: (values: KnowledgeUnitRequest) => void;
+  onCancel: () => void;
+  onAddDocument: () => void;
+  onRemoveDocument: (index: number) => void;
+  loading: boolean;
+  documents: DocumentRequest[];
 }
 
-export function KnowledgeUnitForm({ onSuccess }: CreateKnowledgeUnitForm) {
-  const location = useLocation();
+export function KnowledgeUnitForm({ 
+  onSubmit, 
+  onCancel, 
+  onAddDocument, 
+  onRemoveDocument, 
+  loading, 
+  documents 
+}: KnowledgeUnitFormProps) {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (values: KnowledgeUnitRequest) => {
-    try {
-      setLoading(true);
-      await KnowledgeUnitRepository2.createKnowledgeUnit(values);
-      message.success('Knowledge unit created successfully!');
-      form.resetFields();
-      
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        location.route('/');
-      }
-    } catch (error) {
-      console.error('Error creating knowledge unit:', error);
-      message.error('Failed to create knowledge unit');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCancel = () => {
-    location.route('/');
+  const handleSubmit = (values: KnowledgeUnitRequest) => {
+    onSubmit(values);
+    form.resetFields();
   };
 
   return (
@@ -47,7 +36,7 @@ export function KnowledgeUnitForm({ onSuccess }: CreateKnowledgeUnitForm) {
         <Button
           type="text"
           icon={<ArrowLeftOutlined />}
-          onClick={handleCancel}
+          onClick={onCancel}
           style={{ marginBottom: '16px' }}
         >
           Back to Knowledge Units
@@ -95,30 +84,67 @@ export function KnowledgeUnitForm({ onSuccess }: CreateKnowledgeUnitForm) {
             />
           </Form.Item>
 
+          {documents.length > 0 && (
+            <Form.Item label="Documents">
+              <List
+                size="small"
+                dataSource={documents}
+                renderItem={(doc, index) => (
+                  <List.Item
+                    actions={[
+                      <Button
+                        type="text"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => onRemoveDocument(index)}
+                      />
+                    ]}
+                  >
+                    <List.Item.Meta
+                      title={doc.name}
+                      description={doc.content?.substring(0, 100) + (doc.content && doc.content.length > 100 ? '...' : '')}
+                    />
+                  </List.Item>
+                )}
+              />
+            </Form.Item>
+          )}
+
           <Form.Item style={{ marginBottom: 0 }}>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
               <Button
                 type="default"
-                onClick={handleCancel}
+                onClick={onAddDocument}
+                icon={<PlusOutlined />}
                 size="large"
                 style={{ borderRadius: '8px' }}
               >
-                Cancel
+                Add Document
               </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={loading}
-                icon={<SaveOutlined />}
-                size="large"
-                style={{
-                  backgroundColor: '#52c41a',
-                  borderColor: '#52c41a',
-                  borderRadius: '8px'
-                }}
-              >
-                Create Knowledge Unit
-              </Button>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <Button
+                  type="default"
+                  onClick={onCancel}
+                  size="large"
+                  style={{ borderRadius: '8px' }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
+                  icon={<SaveOutlined />}
+                  size="large"
+                  style={{
+                    backgroundColor: '#52c41a',
+                    borderColor: '#52c41a',
+                    borderRadius: '8px'
+                  }}
+                >
+                  Create Knowledge Unit
+                </Button>
+              </div>
             </div>
           </Form.Item>
         </Form>

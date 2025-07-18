@@ -4,6 +4,7 @@ import { EditOutlined, DeleteOutlined, DownloadOutlined, PlusOutlined } from '@a
 import { useLocation } from 'preact-iso';
 import { KnowledgeUnitRepository2 as KnowledgeUnitRepository } from '../repositories/knowledge.unit.repository2';
 import { KnowledgeUnit } from '../generated/api/src';
+import { routes } from '..';
 
 const { Title } = Typography;
 
@@ -59,7 +60,7 @@ export function KnowledgeUnitList() {
  };
 
  const handleCreateNew = () => {
-  location.route('/create');
+  location.route(routes.createKuPath());
  };
 
  return (

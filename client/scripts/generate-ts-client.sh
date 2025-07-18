@@ -1,0 +1,1 @@
+npx openapi-generator-cli generate -i ../server/src/main/resources/META-INF/openapi.yaml -g typescript-fetch -o src/api
