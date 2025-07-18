@@ -152,3 +152,8 @@ The application includes:
 4.2 backend: quarkus with java
 4.3 database: postgres
 4.4 vector_database: postgres
+5. Commiting messages
+5.1. when writting "CM" and nothing else , prepare a commit message.
+5.2. never "git add" nor propose "git add"
+5.3. do not set claude as co-auhtor
+5.4. when wrtitin "CMP" and nothing else, prepare a commit message and propose to commit and push
