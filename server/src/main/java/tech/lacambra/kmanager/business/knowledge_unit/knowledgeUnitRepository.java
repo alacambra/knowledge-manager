@@ -2,6 +2,7 @@ package tech.lacambra.kmanager.business.knowledge_unit;
 
 import static tech.lacambra.kmanager.generated.jooq.tables.KnowledgeUnit.*;
 import static tech.lacambra.kmanager.generated.jooq.tables.KnowledgeUnitDocument.*;
+import static tech.lacambra.kmanager.generated.jooq.tables.Document.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -13,6 +14,10 @@ import org.jooq.impl.DSL;
 
 import tech.lacambra.kmanager.generated.jooq.tables.pojos.KnowledgeUnit;
 import tech.lacambra.kmanager.generated.jooq.tables.pojos.KnowledgeUnitDocument;
+import tech.lacambra.kmanager.generated.jooq.tables.pojos.Document;
+import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitWithDocumentsResponse;
+
+import java.util.Optional;
 
 @ApplicationScoped
 public class KnowledgeUnitRepository {
@@ -37,6 +42,40 @@ public class KnowledgeUnitRepository {
       .map(docId -> DSL.row(kuId, docId))
       .toList())
     .execute();
+ }
+
+ public void removeDocumentsFromKU(UUID kuId, List<UUID> documentsId) {
+  dslContext.deleteFrom(KNOWLEDGE_UNIT_DOCUMENT)
+    .where(KNOWLEDGE_UNIT_DOCUMENT.KNOWLEDGE_UNIT_ID.eq(kuId))
+    .and(KNOWLEDGE_UNIT_DOCUMENT.DOCUMENT_ID.in(documentsId))
+    .execute();
+ }
+
+ public void updateKnowledgeUnit(UUID kuId, String name, String description) {
+  dslContext.update(KNOWLEDGE_UNIT)
+    .set(KNOWLEDGE_UNIT.NAME, name)
+    .set(KNOWLEDGE_UNIT.DESCRIPTION, description)
+    .where(KNOWLEDGE_UNIT.ID.eq(kuId))
+    .execute();
+ }
+
+ public Optional<KnowledgeUnitWithDocumentsResponse> findByIdWithDocuments(UUID kuId) {
+  KnowledgeUnit ku = dslContext.select()
+    .from(KNOWLEDGE_UNIT)
+    .where(KNOWLEDGE_UNIT.ID.eq(kuId))
+    .fetchOneInto(KnowledgeUnit.class);
+  
+  if (ku == null) {
+   return Optional.empty();
+  }
+  
+  List<Document> documents = dslContext.select(DOCUMENT.fields())
+    .from(DOCUMENT)
+    .join(KNOWLEDGE_UNIT_DOCUMENT).on(DOCUMENT.ID.eq(KNOWLEDGE_UNIT_DOCUMENT.DOCUMENT_ID))
+    .where(KNOWLEDGE_UNIT_DOCUMENT.KNOWLEDGE_UNIT_ID.eq(kuId))
+    .fetchInto(Document.class);
+  
+  return Optional.of(new KnowledgeUnitWithDocumentsResponse(ku, documents));
  }
 
  public List<KnowledgeUnit> findAll() {

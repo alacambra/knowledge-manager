@@ -24,9 +24,40 @@ public class KnowledgeUnitService {
   UUID kuId = knowledgeUnitRepository
     .create(new KnowledgeUnitInput(knowledgeUnitRequest.name(), knowledgeUnitRequest.description()));
 
-  List<UUID> docIds = documentRepository.createDocuments(knowledgeUnitRequest.documents());
-  knowledgeUnitRepository.addDocumentsToKU(kuId, docIds);
+  // Handle new documents
+  if (knowledgeUnitRequest.newDocuments() != null && !knowledgeUnitRequest.newDocuments().isEmpty()) {
+   List<UUID> newDocIds = documentRepository.createDocuments(knowledgeUnitRequest.newDocuments());
+   knowledgeUnitRepository.addDocumentsToKU(kuId, newDocIds);
+  }
+
+  // Handle adding existing documents
+  if (knowledgeUnitRequest.addedDocumentsIds() != null && !knowledgeUnitRequest.addedDocumentsIds().isEmpty()) {
+   knowledgeUnitRepository.addDocumentsToKU(kuId, knowledgeUnitRequest.addedDocumentsIds());
+  }
 
   return kuId;
+ }
+
+ public void updateKnowledgeUnit(UUID kuId, KnowledgeUnitRequest knowledgeUnitRequest) {
+  // Update KU name and description if provided
+  if (knowledgeUnitRequest.name() != null || knowledgeUnitRequest.description() != null) {
+   knowledgeUnitRepository.updateKnowledgeUnit(kuId, knowledgeUnitRequest.name(), knowledgeUnitRequest.description());
+  }
+
+  // Handle new documents
+  if (knowledgeUnitRequest.newDocuments() != null && !knowledgeUnitRequest.newDocuments().isEmpty()) {
+   List<UUID> newDocIds = documentRepository.createDocuments(knowledgeUnitRequest.newDocuments());
+   knowledgeUnitRepository.addDocumentsToKU(kuId, newDocIds);
+  }
+
+  // Handle adding existing documents
+  if (knowledgeUnitRequest.addedDocumentsIds() != null && !knowledgeUnitRequest.addedDocumentsIds().isEmpty()) {
+   knowledgeUnitRepository.addDocumentsToKU(kuId, knowledgeUnitRequest.addedDocumentsIds());
+  }
+
+  // Handle removing documents
+  if (knowledgeUnitRequest.removedDocumentsIds() != null && !knowledgeUnitRequest.removedDocumentsIds().isEmpty()) {
+   knowledgeUnitRepository.removeDocumentsFromKU(kuId, knowledgeUnitRequest.removedDocumentsIds());
+  }
  }
 }

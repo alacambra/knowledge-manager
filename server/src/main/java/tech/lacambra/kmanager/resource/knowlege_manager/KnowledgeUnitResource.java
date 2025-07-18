@@ -4,7 +4,9 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -34,8 +36,24 @@ public class KnowledgeUnitResource {
                 .build();
     }
     
+    @PUT
+    @Path("/{id}")
+    public Response updateKnowledgeUnit(@PathParam("id") UUID id, KnowledgeUnitRequest request) {
+        service.updateKnowledgeUnit(id, request);
+        return Response.status(Response.Status.OK)
+                .build();
+    }
+    
     @GET
     public List<KnowledgeUnit> getKnowledgeUnits() {
         return repository.findAll();
+    }
+    
+    @GET
+    @Path("/{id}")
+    public Response getKnowledgeUnitWithDocuments(@PathParam("id") UUID id) {
+        return repository.findByIdWithDocuments(id)
+                .map(kuWithDocs -> Response.ok(kuWithDocs).build())
+                .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
 }
