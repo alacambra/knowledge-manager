@@ -1,6 +1,73 @@
 {
   "openapi" : "3.1.0",
   "paths" : {
+    "/documents" : {
+      "get" : {
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Document"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary" : "Get All Documents",
+        "tags" : [ "Documents Manager Resource" ]
+      }
+    },
+    "/documents/upload" : {
+      "post" : {
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/DocumentRequest"
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Upload Documents",
+        "tags" : [ "Documents Manager Resource" ]
+      }
+    },
+    "/documents/{id}" : {
+      "delete" : {
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "summary" : "Remove Document",
+        "tags" : [ "Documents Manager Resource" ]
+      }
+    },
     "/hello" : {
       "get" : {
         "responses" : {
@@ -198,6 +265,31 @@
           }
         }
       },
+      "Document" : {
+        "type" : "object",
+        "required" : [ "title", "content" ],
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "title" : {
+            "type" : "string"
+          },
+          "content" : {
+            "type" : "string"
+          },
+          "embedding" : { },
+          "metadata" : {
+            "$ref" : "#/components/schemas/JSONB"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/LocalDateTime"
+          }
+        }
+      },
       "DocumentRequest" : {
         "type" : "object",
         "properties" : {
@@ -209,8 +301,17 @@
           }
         }
       },
+      "JSONB" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "type" : "string"
+          }
+        }
+      },
       "KnowledgeUnit" : {
         "type" : "object",
+        "required" : [ "name" ],
         "properties" : {
           "id" : {
             "$ref" : "#/components/schemas/UUID"
@@ -228,8 +329,7 @@
           "updatedAt" : {
             "$ref" : "#/components/schemas/LocalDateTime"
           }
-        },
-        "required" : [ "name" ]
+        }
       },
       "KnowledgeUnitRequest" : {
         "type" : "object",

@@ -2,6 +2,8 @@ import { useState } from 'preact/hooks';
 import { message } from 'antd';
 import { useLocation } from 'preact-iso';
 import type { DocumentRequest } from '../api/models';
+import { DocumentRepository } from '../repositories/document.repository';
+import { routes } from '..';
 
 interface DocumentFormData {
   name: string;
@@ -33,9 +35,9 @@ export function useDocument(config: UseDocumentConfig) {
           config.onSuccess(documentData);
         }
       } else {
-        // For standalone mode, navigate back to KU form with document data
-        const encodedData = encodeURIComponent(JSON.stringify(documentData));
-        location.route(`/create-ku?newDocument=${encodedData}`);
+        // For standalone mode, upload the document and navigate back to documents list
+        await DocumentRepository.uploadDocuments([documentData]);
+        location.route(routes.documentsPath());
       }
       
       message.success('Document added successfully!');
@@ -54,7 +56,7 @@ export function useDocument(config: UseDocumentConfig) {
     } else {
       // Default behavior based on mode
       if (config.mode === 'standalone') {
-        location.route('/create-ku');
+        location.route(routes.documentsPath());
       }
     }
   };

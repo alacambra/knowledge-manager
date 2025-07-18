@@ -31,10 +31,12 @@ import { Header } from './components/Header.jsx';
 import { Home } from './pages/Home/index.jsx';
 import { NotFound } from './pages/_404.jsx';
 import { WorkInProgress } from './pages/WorkInProgress';
-import { CreateKUContainer } from './containers/CreateKUContainer';
-import { CreateDocumentContainer } from './containers/CreateDocumentContainer';
+import { CreateKUContainer } from './containers/KnowledgeUnitManagment.js';
+import { DocumentsManagement } from './containers/DocumentsManagement';
 import './style.css';
 import 'antd/dist/reset.css';
+import { KnowledgeUnitList } from './components/KnowledgeUnitList';
+import { DocumentList } from './components/DocumentList';
 
 // Configure Preact to align with browser's idle time
 options.debounceRendering = (typeof requestIdleCallback !== 'undefined')
@@ -48,10 +50,12 @@ export const routes = {
  rootPattern: "/",
  editKuPath: (id: string) => `/edit/${id}`,
  editKuPattern: '/edit/:id',
- createKuPath: () => '/create-ku',
- createKuPattern: '/create-ku',
- createDocumentPath: () => `create-document`,
- createDocumentPattern: `create-document`,
+ knowledgeUnitManagmentPath: () => '/knowledge-units',
+ knowledgeUnitManagmentPattern:'/knowledge-units',
+ documentsPath: () => '/documents',
+ documentsPattern: '/documents',
+ createDocumentPath: () => '/create-document',
+ createDocumentPattern: '/create-document',
 };
 
 export function App() {
@@ -67,10 +71,11 @@ export function App() {
      <Header />
      <main>
       <Router>
-       <Route path="/" component={Home} />
+       <Route path="/" component={KnowledgeUnitList} />
        <Route path={routes.editKuPattern} component={WorkInProgress} />
-       <Route path={routes.createKuPattern} component={CreateKUContainer} />
-       <Route path={routes.createDocumentPattern} component={CreateDocumentContainer} />
+       <Route path={routes.knowledgeUnitManagmentPattern} component={KnowledgeUnitList} />
+       <Route path={routes.documentsPattern} component={DocumentList} />
+       <Route path={routes.createDocumentPattern} component={DocumentsManagement} />
        <Route default component={NotFound} />
       </Router>
      </main>

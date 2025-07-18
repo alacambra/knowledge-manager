@@ -1,10 +1,13 @@
+apis/DocumentsManagerResourceApi.ts
 apis/GreetingResourceApi.ts
 apis/HelloAIResourceApi.ts
 apis/KnowledgeUnitResourceApi.ts
 apis/index.ts
 index.ts
 models/CreateDocumentRequest.ts
+models/Document.ts
 models/DocumentRequest.ts
+models/JSONB.ts
 models/KnowledgeUnit.ts
 models/KnowledgeUnitRequest.ts
 models/index.ts

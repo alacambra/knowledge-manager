@@ -55,7 +55,7 @@ export function useKnowledgeUnitList() {
   };
 
   const handleCreateNew = () => {
-    location.route(routes.createKuPath());
+    location.route(routes.knowledgeUnitManagmentPath());
   };
 
   return {

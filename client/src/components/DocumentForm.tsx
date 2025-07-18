@@ -48,7 +48,7 @@ export function DocumentForm({
           onClick={handleCancel}
           style={{ marginBottom: '16px' }}
         >
-          Back to Knowledge Unit
+          {mode === 'embedded' ? 'Back to Knowledge Unit' : 'Back to Documents'}
         </Button>
         <Title level={2}>Create New Document</Title>
       </div>

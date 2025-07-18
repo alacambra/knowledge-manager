@@ -235,4 +235,17 @@ public class DocumentRepository {
     .limit(limit)
     .fetchInto(DocumentResult.class);
  }
+
+ /**
+  * Delete a document by ID.
+  * 
+  * @param id Document ID
+  * @return true if document was deleted, false otherwise
+  */
+ public boolean deleteDocument(UUID id) {
+  int deletedRows = dsl.deleteFrom(DOCUMENT)
+    .where(DOCUMENT.ID.eq(id))
+    .execute();
+  return deletedRows > 0;
+ }
 }
