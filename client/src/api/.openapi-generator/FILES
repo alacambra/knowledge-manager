@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/GreetingResourceApi.ts
 apis/HelloAIResourceApi.ts
 apis/KnowledgeUnitResourceApi.ts

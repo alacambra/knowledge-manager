@@ -56,7 +56,7 @@ export function KnowledgeUnitForm({
             name="name"
             rules={[
               { required: true, message: 'Please enter a name for the knowledge unit' },
-              { min: 2, message: 'Name must be at least 2 characters long' },
+              // { min: 2, message: 'Name must be at least 2 characters long' },
               { max: 100, message: 'Name must not exceed 100 characters' }
             ]}
           >
@@ -72,7 +72,7 @@ export function KnowledgeUnitForm({
             name="description"
             rules={[
               { required: true, message: 'Please enter a description' },
-              { min: 10, message: 'Description must be at least 10 characters long' },
+              // { min: 10, message: 'Description must be at least 10 characters long' },
               { max: 1000, message: 'Description must not exceed 1000 characters' }
             ]}
           >

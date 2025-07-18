@@ -3,8 +3,8 @@ import { Button, List, Space, Typography, Modal, Input, message } from 'antd';
 import { EditOutlined, DeleteOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons';
 import { useLocation } from 'preact-iso';
 import { KnowledgeUnitRepository2 as KnowledgeUnitRepository } from '../repositories/knowledge.unit.repository2';
-import { KnowledgeUnit } from '../generated/api/src';
 import { routes } from '..';
+import { KnowledgeUnit } from '../api';
 
 const { Title } = Typography;
 

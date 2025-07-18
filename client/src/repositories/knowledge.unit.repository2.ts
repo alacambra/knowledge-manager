@@ -1,5 +1,4 @@
-import { KnowledgeUnitResourceApi, Configuration } from '../generated/api/src';
-import type { KnowledgeUnit, KnowledgeUnitRequest } from '../generated/api/src';
+import { Configuration, KnowledgeUnit, KnowledgeUnitRequest, KnowledgeUnitResourceApi } from "../api";
 
 /**
  * KnowledgeUnitRepository2 - Real API implementation using generated client

@@ -50,7 +50,7 @@ export function DocumentForm({ onSubmit, onCancel, loading }: DocumentFormProps)
             name="name"
             rules={[
               { required: true, message: 'Please enter a name for the document' },
-              { min: 2, message: 'Name must be at least 2 characters long' },
+              // { min: 2, message: 'Name must be at least 2 characters long' },
               { max: 200, message: 'Name must not exceed 200 characters' }
             ]}
           >
@@ -66,7 +66,7 @@ export function DocumentForm({ onSubmit, onCancel, loading }: DocumentFormProps)
             name="content"
             rules={[
               { required: true, message: 'Please enter document content' },
-              { min: 10, message: 'Content must be at least 10 characters long' }
+              // { min: 10, message: 'Content must be at least 10 characters long' }
             ]}
           >
             <TextArea
