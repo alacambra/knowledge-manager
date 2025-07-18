@@ -198,9 +198,19 @@
           }
         }
       },
+      "DocumentRequest" : {
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "content" : {
+            "type" : "string"
+          }
+        }
+      },
       "KnowledgeUnit" : {
         "type" : "object",
-        "required" : [ "name" ],
         "properties" : {
           "id" : {
             "$ref" : "#/components/schemas/UUID"
@@ -213,12 +223,13 @@
             "type" : "string"
           },
           "createdAt" : {
-            "$ref" : "#/components/schemas/OffsetDateTime"
+            "$ref" : "#/components/schemas/LocalDateTime"
           },
           "updatedAt" : {
-            "$ref" : "#/components/schemas/OffsetDateTime"
+            "$ref" : "#/components/schemas/LocalDateTime"
           }
-        }
+        },
+        "required" : [ "name" ]
       },
       "KnowledgeUnitRequest" : {
         "type" : "object",
@@ -228,13 +239,19 @@
           },
           "description" : {
             "type" : "string"
+          },
+          "documents" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DocumentRequest"
+            }
           }
         }
       },
-      "OffsetDateTime" : {
+      "LocalDateTime" : {
         "type" : "string",
         "format" : "date-time",
-        "examples" : [ "2022-03-10T12:15:50-04:00" ]
+        "examples" : [ "2022-03-10T12:15:50" ]
       },
       "UUID" : {
         "type" : "string",

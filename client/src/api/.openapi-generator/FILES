@@ -1,0 +1,12 @@
+.openapi-generator-ignore
+apis/GreetingResourceApi.ts
+apis/HelloAIResourceApi.ts
+apis/KnowledgeUnitResourceApi.ts
+apis/index.ts
+index.ts
+models/CreateDocumentRequest.ts
+models/DocumentRequest.ts
+models/KnowledgeUnit.ts
+models/KnowledgeUnitRequest.ts
+models/index.ts
+runtime.ts
