@@ -1,32 +1,34 @@
-import { useState } from 'preact/hooks';
 import { Button, Form, Input, Typography, Card, List } from 'antd';
 import { SaveOutlined, ArrowLeftOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import type { KnowledgeUnitRequest, DocumentRequest } from '../api/models';
+import { useKnowledgeUnit } from '../hooks/useKnowledgeUnit';
+import type { KnowledgeUnitRequest } from '../api/models';
 
 const { Title } = Typography;
 const { TextArea } = Input;
 
 interface KnowledgeUnitFormProps {
-  onSubmit: (values: KnowledgeUnitRequest) => void;
-  onCancel: () => void;
-  onAddDocument: () => void;
-  onRemoveDocument: (index: number) => void;
-  loading: boolean;
-  documents: DocumentRequest[];
+  useKnowledgeUnitHook?: ReturnType<typeof useKnowledgeUnit>;
+  onSuccess?: () => void;
 }
 
 export function KnowledgeUnitForm({ 
-  onSubmit, 
-  onCancel, 
-  onAddDocument, 
-  onRemoveDocument, 
-  loading, 
-  documents 
+  useKnowledgeUnitHook,
+  onSuccess 
 }: KnowledgeUnitFormProps) {
   const [form] = Form.useForm();
+  
+  const defaultHook = useKnowledgeUnit({ onSuccess });
+  const {
+    loading,
+    documents,
+    handleSubmit,
+    handleCancel,
+    handleAddDocument,
+    handleRemoveDocument
+  } = useKnowledgeUnitHook || defaultHook;
 
-  const handleSubmit = (values: KnowledgeUnitRequest) => {
-    onSubmit(values);
+  const handleFormSubmit = (values: KnowledgeUnitRequest) => {
+    handleSubmit(values);
     form.resetFields();
   };
 
@@ -36,7 +38,7 @@ export function KnowledgeUnitForm({
         <Button
           type="text"
           icon={<ArrowLeftOutlined />}
-          onClick={onCancel}
+          onClick={handleCancel}
           style={{ marginBottom: '16px' }}
         >
           Back to Knowledge Units
@@ -48,7 +50,7 @@ export function KnowledgeUnitForm({
         <Form
           form={form}
           layout="vertical"
-          onFinish={handleSubmit}
+          onFinish={handleFormSubmit}
           autoComplete="off"
         >
           <Form.Item
@@ -96,7 +98,7 @@ export function KnowledgeUnitForm({
                         type="text"
                         danger
                         icon={<DeleteOutlined />}
-                        onClick={() => onRemoveDocument(index)}
+                        onClick={() => handleRemoveDocument(index)}
                       />
                     ]}
                   >
@@ -114,7 +116,7 @@ export function KnowledgeUnitForm({
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
               <Button
                 type="default"
-                onClick={onAddDocument}
+                onClick={handleAddDocument}
                 icon={<PlusOutlined />}
                 size="large"
                 style={{ borderRadius: '8px' }}
@@ -124,7 +126,7 @@ export function KnowledgeUnitForm({
               <div style={{ display: 'flex', gap: '12px' }}>
                 <Button
                   type="default"
-                  onClick={onCancel}
+                  onClick={handleCancel}
                   size="large"
                   style={{ borderRadius: '8px' }}
                 >

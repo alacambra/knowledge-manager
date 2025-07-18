@@ -1,67 +1,18 @@
-import { useState, useEffect } from 'preact/hooks';
-import { Button, List, Space, Typography, Modal, Input, message } from 'antd';
+import { Button, List, Space, Typography } from 'antd';
 import { EditOutlined, DeleteOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons';
-import { useLocation } from 'preact-iso';
-import { KnowledgeUnitRepository2 as KnowledgeUnitRepository } from '../repositories/knowledge.unit.repository2';
-import { routes } from '..';
-import { KnowledgeUnit } from '../api';
+import { useKnowledgeUnitList } from '../hooks/useKnowledgeUnitList';
 
 const { Title } = Typography;
 
-
 export function KnowledgeUnitList() {
- const location = useLocation();
- const [knowledgeUnits, setKnowledgeUnits] = useState<KnowledgeUnit[]>([]);
- const [loading, setLoading] = useState(true);
-
- const loadKnowledgeUnits = async () => {
-  try {
-   setLoading(true);
-   const units = await KnowledgeUnitRepository.listKnowledgeUnits();
-   setKnowledgeUnits(units);
-  } catch (error) {
-   message.error(error.message);
-  } finally {
-   setLoading(false);
-  }
- };
-
- useEffect(() => {
-  loadKnowledgeUnits();
- }, []);
-
- const handleDelete = (id: string) => {
-  Modal.confirm({
-   title: 'Are you sure you want to delete this knowledge unit?',
-   content: 'This action cannot be undone.',
-   async onOk() {
-    try {
-     const success = await KnowledgeUnitRepository.deleteKnowledgeUnit(id);
-     if (success) {
-      setKnowledgeUnits(prev => prev.filter(ku => ku.id !== id));
-      message.success('Knowledge unit deleted successfully');
-     } else {
-      message.error('Failed to delete knowledge unit');
-     }
-    } catch (error) {
-     message.error('Failed to delete knowledge unit');
-    }
-   },
-  });
- };
-
- const handleDownload = (knowledgeUnit: KnowledgeUnit) => {
-  // TODO: Implement download functionality
-  message.info(`Downloading ${knowledgeUnit.name}...`);
- };
-
- const handleEdit = (knowledgeUnit: KnowledgeUnit) => {
-  location.route(`/edit/${knowledgeUnit.id}`);
- };
-
- const handleCreateNew = () => {
-  location.route(routes.createKuPath());
- };
+  const {
+    knowledgeUnits,
+    loading,
+    handleDelete,
+    handleDownload,
+    handleEdit,
+    handleCreateNew
+  } = useKnowledgeUnitList();
 
  return (
   <div style={{ padding: '24px', height: '100vh', overflow: 'auto' }}>

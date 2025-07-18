@@ -1,6 +1,7 @@
-import { useState } from 'preact/hooks';
 import { Button, Form, Input, Typography, Card } from 'antd';
 import { SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { useDocument } from '../hooks/useDocument';
+import type { DocumentRequest } from '../api/models';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -11,16 +12,30 @@ interface DocumentFormData {
 }
 
 interface DocumentFormProps {
-  onSubmit: (values: DocumentFormData) => void;
-  onCancel: () => void;
-  loading: boolean;
+  useDocumentHook?: ReturnType<typeof useDocument>;
+  onSuccess?: (document: DocumentRequest) => void;
+  onCancel?: () => void;
+  mode?: 'embedded' | 'standalone';
 }
 
-export function DocumentForm({ onSubmit, onCancel, loading }: DocumentFormProps) {
+export function DocumentForm({ 
+  useDocumentHook, 
+  onSuccess, 
+  onCancel, 
+  mode = 'standalone' 
+}: DocumentFormProps) {
   const [form] = Form.useForm();
+  
+  const defaultHook = useDocument({ 
+    mode, 
+    onSuccess, 
+    onCancel 
+  });
+  
+  const { loading, handleSubmit, handleCancel } = useDocumentHook || defaultHook;
 
-  const handleSubmit = (values: DocumentFormData) => {
-    onSubmit(values);
+  const handleFormSubmit = (values: DocumentFormData) => {
+    handleSubmit(values);
     form.resetFields();
   };
 
@@ -30,7 +45,7 @@ export function DocumentForm({ onSubmit, onCancel, loading }: DocumentFormProps)
         <Button
           type="text"
           icon={<ArrowLeftOutlined />}
-          onClick={onCancel}
+          onClick={handleCancel}
           style={{ marginBottom: '16px' }}
         >
           Back to Knowledge Unit
@@ -42,7 +57,7 @@ export function DocumentForm({ onSubmit, onCancel, loading }: DocumentFormProps)
         <Form
           form={form}
           layout="vertical"
-          onFinish={handleSubmit}
+          onFinish={handleFormSubmit}
           autoComplete="off"
         >
           <Form.Item
@@ -81,7 +96,7 @@ export function DocumentForm({ onSubmit, onCancel, loading }: DocumentFormProps)
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <Button
                 type="default"
-                onClick={onCancel}
+                onClick={handleCancel}
                 size="large"
                 style={{ borderRadius: '8px' }}
               >
