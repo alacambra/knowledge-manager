@@ -1,0 +1,93 @@
+{
+ "folders": [
+  {
+   "path": "."
+  }
+ ],
+ "settings": {
+  "java.configuration.updateBuildConfiguration": "automatic"
+ },
+ "launch": {
+  "version": "0.2.0",
+  "configurations": [
+   {
+    "name": "Debug Client (Frontend)",
+    "type": "chrome",
+    "request": "launch",
+    "url": "http://localhost:5173",
+    "webRoot": "${workspaceFolder}/client/src",
+    "sourceMaps": true,
+    "skipFiles": [
+     "<node_internals>/**",
+     "node_modules/**"
+    ]
+   },
+   {
+    "type": "java",
+    "name": "Attach to Quarkus",
+    "request": "attach",
+    "hostName": "localhost",
+    "port": 5005,
+    "timeout": 30000
+   },
+  ]
+ },
+ "tasks": {
+  "version": "2.0.0",
+  "tasks": [
+   {
+    "label": "Start client dev mode",
+    "type": "shell",
+    "command": "npm",
+    "args": [
+     "run",
+     "dev"
+    ],
+    "group": "build",
+    "isBackground": true,
+    "problemMatcher": [],
+    "presentation": {
+     "reveal": "always",
+     "panel": "new"
+    },
+    "options": {
+     "cwd": "${workspaceFolder}/client"
+    }
+   },
+   {
+    "label": "Start Server dev mode",
+    "type": "shell",
+    "command": "bash",
+    "args": [
+     "-c",
+     "source server/src/main/scripts/jooq/export-envs.sh && ./server/mvnw quarkus:dev -f server/pom.xml"
+    ],
+    "group": "build",
+    "isBackground": true,
+    "problemMatcher": [],
+    "presentation": {
+     "reveal": "always",
+     "panel": "new"
+    },
+    "windows": {
+     "command": "./server/mvnw.cmd"
+    },
+    "options": {
+     "envFile": "${workspaceFolder}/server/.env.backend",
+     "env": {
+      "EMBEDDING_MODEL_PATH": "/Users/albert/git/models/sentence-transformers/all-MiniLM-L6-v2/onnx"
+     }
+    },
+   },
+   {
+    "label": "Start All dev mode (Frontend + Backend)",
+    "dependsOrder": "parallel",
+    "dependsOn": [
+     "Start client dev mode",
+     "Start Server dev mode"
+    ],
+    "group": "build"
+   }
+  ]
+ }
+}

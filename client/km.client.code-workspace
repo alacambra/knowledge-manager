@@ -1,25 +1,25 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {},
-	"launch": {
-		"version": "0.2.0",
-		"configurations": [
-			{
-				"name": "Debug Client (Frontend)",
-				"type": "chrome",
-				"request": "launch",
-				"url": "http://localhost:5173",
-				"webRoot": "${workspaceFolder}/src",
-				"sourceMaps": true,
-				"skipFiles": [
-					"<node_internals>/**",
-					"node_modules/**"
-				]
-			}
-		]
-	}
+ "folders": [
+  {
+   "path": "."
+  }
+ ],
+ "settings": {},
+ "launch": {
+  "version": "0.2.0",
+  "configurations": [
+   {
+    "name": "Debug Client (Frontend)",
+    "type": "chrome",
+    "request": "launch",
+    "url": "http://localhost:5173",
+    "webRoot": "${workspaceFolder}/src",
+    "sourceMaps": true,
+    "skipFiles": [
+     "<node_internals>/**",
+     "node_modules/**"
+    ]
+   }
+  ]
+ }
 }
