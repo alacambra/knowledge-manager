@@ -175,6 +175,58 @@ paths:
       summary: Create Knowledge Unit
       tags:
       - Knowledge Unit Resource
+  /knowledge-units/{id}:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KnowledgeUnitRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      summary: Update Knowledge Unit
+      tags:
+      - Knowledge Unit Resource
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeUnitWithDocumentsResponse"
+      summary: Get Knowledge Unit With Documents
+      tags:
+      - Knowledge Unit Resource
+    delete:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "204":
+          description: No Content
+      summary: Delete Knowledge Unit
+      tags:
+      - Knowledge Unit Resource
 components:
   schemas:
     CreateDocumentRequest:
@@ -240,6 +292,22 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DocumentRequest"
+        newDocuments:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentRequest"
+        addedDocumentsIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+            pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+        removedDocumentsIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+            pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
     LocalDateTime:
       type: string
       format: date-time
@@ -249,6 +317,15 @@ components:
       type: string
       format: uuid
       pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+    KnowledgeUnitWithDocumentsResponse:
+      type: object
+      properties:
+        knowledgeUnit:
+          $ref: "#/components/schemas/KnowledgeUnit"
+        documents:
+          type: array
+          items:
+            $ref: "#/components/schemas/Document"
 info:
   title: Knowledge Manager API
   version: 1.0.0

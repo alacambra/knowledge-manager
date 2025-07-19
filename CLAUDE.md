@@ -157,3 +157,10 @@ The application includes:
 5.2. never "git add" nor propose "git add"
 5.3. do not set claude as co-auhtor
 5.4. when wrtitin "CMP" and nothing else, prepare a commit message and propose to commit and push
+6. Typescript coding rules:
+6.1 avoid the use of "any" always when possible
+6.2 if any is used, explain clearlywhy is it needed
+6.3 always use explicit types 
+7. General coding rules
+7.1 Comments are only allowed for public or exported classes and methods. 
+7.2. If there is a need in the code for an explanation, do not create a comment. Create instead a method/function witha self explanatory name.

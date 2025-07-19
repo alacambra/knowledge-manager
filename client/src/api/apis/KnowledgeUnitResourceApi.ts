@@ -17,13 +17,25 @@ import * as runtime from '../runtime';
 import type {
   KnowledgeUnit,
   KnowledgeUnitRequest,
+  KnowledgeUnitWithDocumentsResponse,
 } from '../models/index';
 import {
     KnowledgeUnitFromJSON,
     KnowledgeUnitToJSON,
     KnowledgeUnitRequestFromJSON,
     KnowledgeUnitRequestToJSON,
+    KnowledgeUnitWithDocumentsResponseFromJSON,
+    KnowledgeUnitWithDocumentsResponseToJSON,
 } from '../models/index';
+
+export interface KnowledgeUnitsIdGetRequest {
+    id: string;
+}
+
+export interface KnowledgeUnitsIdPutRequest {
+    id: string;
+    knowledgeUnitRequest: KnowledgeUnitRequest;
+}
 
 export interface KnowledgeUnitsPostRequest {
     knowledgeUnitRequest: KnowledgeUnitRequest;
@@ -61,6 +73,89 @@ export class KnowledgeUnitResourceApi extends runtime.BaseAPI {
     async knowledgeUnitsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<KnowledgeUnit>> {
         const response = await this.knowledgeUnitsGetRaw(initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Get Knowledge Unit With Documents
+     */
+    async knowledgeUnitsIdGetRaw(requestParameters: KnowledgeUnitsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<KnowledgeUnitWithDocumentsResponse>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling knowledgeUnitsIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/knowledge-units/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => KnowledgeUnitWithDocumentsResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Get Knowledge Unit With Documents
+     */
+    async knowledgeUnitsIdGet(requestParameters: KnowledgeUnitsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<KnowledgeUnitWithDocumentsResponse> {
+        const response = await this.knowledgeUnitsIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Update Knowledge Unit
+     */
+    async knowledgeUnitsIdPutRaw(requestParameters: KnowledgeUnitsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling knowledgeUnitsIdPut().'
+            );
+        }
+
+        if (requestParameters['knowledgeUnitRequest'] == null) {
+            throw new runtime.RequiredError(
+                'knowledgeUnitRequest',
+                'Required parameter "knowledgeUnitRequest" was null or undefined when calling knowledgeUnitsIdPut().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+
+        let urlPath = `/knowledge-units/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: KnowledgeUnitRequestToJSON(requestParameters['knowledgeUnitRequest']),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Update Knowledge Unit
+     */
+    async knowledgeUnitsIdPut(requestParameters: KnowledgeUnitsIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.knowledgeUnitsIdPutRaw(requestParameters, initOverrides);
     }
 
     /**

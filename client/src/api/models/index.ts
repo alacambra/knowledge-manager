@@ -6,3 +6,4 @@ export * from './DocumentRequest';
 export * from './JSONB';
 export * from './KnowledgeUnit';
 export * from './KnowledgeUnitRequest';
+export * from './KnowledgeUnitWithDocumentsResponse';

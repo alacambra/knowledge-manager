@@ -10,5 +10,6 @@ models/DocumentRequest.ts
 models/JSONB.ts
 models/KnowledgeUnit.ts
 models/KnowledgeUnitRequest.ts
+models/KnowledgeUnitWithDocumentsResponse.ts
 models/index.ts
 runtime.ts

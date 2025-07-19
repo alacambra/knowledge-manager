@@ -1,10 +1,10 @@
 import { DocumentForm } from '../components/DocumentForm';
 
-interface DocumentsManagementProps {
+interface CreateDocumentContainerProps {
   onSuccess?: () => void;
 }
 
-export function DocumentsManagement({ onSuccess }: DocumentsManagementProps) {
+export function CreateDocumentPage({ onSuccess }: CreateDocumentContainerProps) {
   return (
     <DocumentForm
       mode="standalone"

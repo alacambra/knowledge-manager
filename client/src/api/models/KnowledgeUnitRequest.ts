@@ -45,6 +45,24 @@ export interface KnowledgeUnitRequest {
      * @memberof KnowledgeUnitRequest
      */
     documents?: Array<DocumentRequest>;
+    /**
+     * 
+     * @type {Array<DocumentRequest>}
+     * @memberof KnowledgeUnitRequest
+     */
+    newDocuments?: Array<DocumentRequest>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof KnowledgeUnitRequest
+     */
+    addedDocumentsIds?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof KnowledgeUnitRequest
+     */
+    removedDocumentsIds?: Array<string>;
 }
 
 /**
@@ -67,6 +85,9 @@ export function KnowledgeUnitRequestFromJSONTyped(json: any, ignoreDiscriminator
         'name': json['name'] == null ? undefined : json['name'],
         'description': json['description'] == null ? undefined : json['description'],
         'documents': json['documents'] == null ? undefined : ((json['documents'] as Array<any>).map(DocumentRequestFromJSON)),
+        'newDocuments': json['newDocuments'] == null ? undefined : ((json['newDocuments'] as Array<any>).map(DocumentRequestFromJSON)),
+        'addedDocumentsIds': json['addedDocumentsIds'] == null ? undefined : json['addedDocumentsIds'],
+        'removedDocumentsIds': json['removedDocumentsIds'] == null ? undefined : json['removedDocumentsIds'],
     };
 }
 
@@ -84,6 +105,9 @@ export function KnowledgeUnitRequestToJSONTyped(value?: KnowledgeUnitRequest | n
         'name': value['name'],
         'description': value['description'],
         'documents': value['documents'] == null ? undefined : ((value['documents'] as Array<any>).map(DocumentRequestToJSON)),
+        'newDocuments': value['newDocuments'] == null ? undefined : ((value['newDocuments'] as Array<any>).map(DocumentRequestToJSON)),
+        'addedDocumentsIds': value['addedDocumentsIds'],
+        'removedDocumentsIds': value['removedDocumentsIds'],
     };
 }
 

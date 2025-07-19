@@ -28,11 +28,9 @@ import { StyleProvider } from '@ant-design/cssinjs';
 import { ConfigProvider } from 'antd';
 
 import { Header } from './components/Header.jsx';
-import { Home } from './pages/Home/index.jsx';
 import { NotFound } from './pages/_404.jsx';
-import { WorkInProgress } from './pages/WorkInProgress';
-import { CreateKUContainer } from './containers/KnowledgeUnitManagment.js';
-import { DocumentsManagement } from './containers/DocumentsManagement';
+import { DocumentsManagementPage } from './containers/DocumentsManagementPage.js';
+import { KnowledgeUnitEdit } from './components/KnowledgeUnitForm.js';
 import './style.css';
 import 'antd/dist/reset.css';
 import { KnowledgeUnitList } from './components/KnowledgeUnitList';
@@ -48,10 +46,12 @@ options.debounceRendering = (typeof requestIdleCallback !== 'undefined')
 export const routes = {
  rootPath: "/",
  rootPattern: "/",
- editKuPath: (id: string) => `/edit/${id}`,
- editKuPattern: '/edit/:id',
+ editKuPath: (id: string) => `/knowledge-unit/${id}`,
+ editKuPattern: '/knowledge-unit/:id',
+ createKuPath: () => `/create-knowledge-unit/`,
+ createKuPattern: `/create-knowledge-unit/`,
  knowledgeUnitManagmentPath: () => '/knowledge-units',
- knowledgeUnitManagmentPattern:'/knowledge-units',
+ knowledgeUnitManagmentPattern: '/knowledge-units',
  documentsPath: () => '/documents',
  documentsPattern: '/documents',
  createDocumentPath: () => '/create-document',
@@ -72,10 +72,11 @@ export function App() {
      <main>
       <Router>
        <Route path="/" component={KnowledgeUnitList} />
-       <Route path={routes.editKuPattern} component={WorkInProgress} />
+       <Route path={routes.editKuPattern} component={KnowledgeUnitEdit} />
+       <Route path={routes.createKuPattern} component={KnowledgeUnitEdit} />
        <Route path={routes.knowledgeUnitManagmentPattern} component={KnowledgeUnitList} />
        <Route path={routes.documentsPattern} component={DocumentList} />
-       <Route path={routes.createDocumentPattern} component={DocumentsManagement} />
+       <Route path={routes.createDocumentPattern} component={DocumentsManagementPage} />
        <Route default component={NotFound} />
       </Router>
      </main>
