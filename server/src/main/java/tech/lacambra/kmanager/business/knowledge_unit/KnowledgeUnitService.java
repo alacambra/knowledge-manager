@@ -1,5 +1,6 @@
 package tech.lacambra.kmanager.business.knowledge_unit;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -7,57 +8,97 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import tech.lacambra.kmanager.business.documents.DocumentRepository;
 import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitRequest;
+import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitWithDocumentsResponse;
 
 @ApplicationScoped
 public class KnowledgeUnitService {
 
- private KnowledgeUnitRepository knowledgeUnitRepository;
- private DocumentRepository documentRepository;
+ private final KnowledgeUnitRepository knowledgeUnitRepository;
+ private final DocumentRepository documentRepository;
+ private final KnowledgeUnitContentProcessor contentProcessor;
+ private final FileExportHelper fileExportHelper;
 
  @Inject
- public KnowledgeUnitService(KnowledgeUnitRepository knowledgeUnitRepository, DocumentRepository documentRepository) {
+ public KnowledgeUnitService(KnowledgeUnitRepository knowledgeUnitRepository, 
+                           DocumentRepository documentRepository,
+                           KnowledgeUnitContentProcessor contentProcessor,
+                           FileExportHelper fileExportHelper) {
   this.knowledgeUnitRepository = knowledgeUnitRepository;
   this.documentRepository = documentRepository;
+  this.contentProcessor = contentProcessor;
+  this.fileExportHelper = fileExportHelper;
  }
 
  public UUID createKnowledgeUnit(KnowledgeUnitRequest knowledgeUnitRequest) {
   UUID kuId = knowledgeUnitRepository
     .create(new KnowledgeUnitInput(knowledgeUnitRequest.name(), knowledgeUnitRequest.description()));
 
-  // Handle new documents
-  if (knowledgeUnitRequest.newDocuments() != null && !knowledgeUnitRequest.newDocuments().isEmpty()) {
-   List<UUID> newDocIds = documentRepository.createDocuments(knowledgeUnitRequest.newDocuments());
-   knowledgeUnitRepository.addDocumentsToKU(kuId, newDocIds);
-  }
+  handleNewDocuments(kuId, knowledgeUnitRequest);
 
-  // Handle adding existing documents
-  if (knowledgeUnitRequest.addedDocumentsIds() != null && !knowledgeUnitRequest.addedDocumentsIds().isEmpty()) {
-   knowledgeUnitRepository.addDocumentsToKU(kuId, knowledgeUnitRequest.addedDocumentsIds());
-  }
+  handleAddingExistingDocuments(kuId, knowledgeUnitRequest);
 
   return kuId;
  }
 
  public void updateKnowledgeUnit(UUID kuId, KnowledgeUnitRequest knowledgeUnitRequest) {
-  // Update KU name and description if provided
-  if (knowledgeUnitRequest.name() != null || knowledgeUnitRequest.description() != null) {
-   knowledgeUnitRepository.updateKnowledgeUnit(kuId, knowledgeUnitRequest.name(), knowledgeUnitRequest.description());
-  }
+  updateKnowledgeUnitBasicInfo(kuId, knowledgeUnitRequest);
 
-  // Handle new documents
-  if (knowledgeUnitRequest.newDocuments() != null && !knowledgeUnitRequest.newDocuments().isEmpty()) {
-   List<UUID> newDocIds = documentRepository.createDocuments(knowledgeUnitRequest.newDocuments());
+  handleNewDocuments(kuId, knowledgeUnitRequest);
+
+  handleAddingExistingDocuments(kuId, knowledgeUnitRequest);
+
+  handleRemovingDocuments(kuId, knowledgeUnitRequest);
+ }
+
+ public String generateConcatenatedText(UUID knowledgeUnitId) {
+  KnowledgeUnitWithDocumentsResponse data = knowledgeUnitRepository
+    .findByIdWithDocumentsOrdered(knowledgeUnitId)
+    .orElseThrow(() -> new KnowledgeUnitNotFoundException(knowledgeUnitId));
+  
+  return contentProcessor.processKnowledgeUnitToText(data);
+ }
+
+ public Path exportToFile(UUID knowledgeUnitId, String filename) {
+  String content = generateConcatenatedText(knowledgeUnitId);
+  
+  String finalFilename = determineFilename(knowledgeUnitId, filename);
+  
+  return fileExportHelper.writeToFile(content, finalFilename);
+ }
+
+ private void handleNewDocuments(UUID kuId, KnowledgeUnitRequest request) {
+  if (request.newDocuments() != null && !request.newDocuments().isEmpty()) {
+   List<UUID> newDocIds = documentRepository.createDocuments(request.newDocuments());
    knowledgeUnitRepository.addDocumentsToKU(kuId, newDocIds);
   }
+ }
 
-  // Handle adding existing documents
-  if (knowledgeUnitRequest.addedDocumentsIds() != null && !knowledgeUnitRequest.addedDocumentsIds().isEmpty()) {
-   knowledgeUnitRepository.addDocumentsToKU(kuId, knowledgeUnitRequest.addedDocumentsIds());
+ private void handleAddingExistingDocuments(UUID kuId, KnowledgeUnitRequest request) {
+  if (request.addedDocumentsIds() != null && !request.addedDocumentsIds().isEmpty()) {
+   knowledgeUnitRepository.addDocumentsToKU(kuId, request.addedDocumentsIds());
   }
+ }
 
-  // Handle removing documents
-  if (knowledgeUnitRequest.removedDocumentsIds() != null && !knowledgeUnitRequest.removedDocumentsIds().isEmpty()) {
-   knowledgeUnitRepository.removeDocumentsFromKU(kuId, knowledgeUnitRequest.removedDocumentsIds());
+ private void handleRemovingDocuments(UUID kuId, KnowledgeUnitRequest request) {
+  if (request.removedDocumentsIds() != null && !request.removedDocumentsIds().isEmpty()) {
+   knowledgeUnitRepository.removeDocumentsFromKU(kuId, request.removedDocumentsIds());
   }
+ }
+
+ private void updateKnowledgeUnitBasicInfo(UUID kuId, KnowledgeUnitRequest request) {
+  if (request.name() != null || request.description() != null) {
+   knowledgeUnitRepository.updateKnowledgeUnit(kuId, request.name(), request.description());
+  }
+ }
+
+ private String determineFilename(UUID knowledgeUnitId, String filename) {
+  if (filename != null && !filename.trim().isEmpty()) {
+   return filename;
+  }
+  
+  KnowledgeUnitWithDocumentsResponse data = knowledgeUnitRepository
+    .findByIdWithDocumentsOrdered(knowledgeUnitId)
+    .orElseThrow(() -> new KnowledgeUnitNotFoundException(knowledgeUnitId));
+  return fileExportHelper.generateDefaultFilename(data.knowledgeUnit().getName());
  }
 }

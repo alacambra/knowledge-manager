@@ -78,6 +78,26 @@ public class KnowledgeUnitRepository {
   return Optional.of(new KnowledgeUnitWithDocumentsResponse(ku, documents));
  }
 
+ public Optional<KnowledgeUnitWithDocumentsResponse> findByIdWithDocumentsOrdered(UUID kuId) {
+  KnowledgeUnit ku = dslContext.select()
+    .from(KNOWLEDGE_UNIT)
+    .where(KNOWLEDGE_UNIT.ID.eq(kuId))
+    .fetchOneInto(KnowledgeUnit.class);
+  
+  if (ku == null) {
+   return Optional.empty();
+  }
+  
+  List<Document> documents = dslContext.select(DOCUMENT.fields())
+    .from(DOCUMENT)
+    .join(KNOWLEDGE_UNIT_DOCUMENT).on(DOCUMENT.ID.eq(KNOWLEDGE_UNIT_DOCUMENT.DOCUMENT_ID))
+    .where(KNOWLEDGE_UNIT_DOCUMENT.KNOWLEDGE_UNIT_ID.eq(kuId))
+    .orderBy(DOCUMENT.CREATED_AT.asc())
+    .fetchInto(Document.class);
+  
+  return Optional.of(new KnowledgeUnitWithDocumentsResponse(ku, documents));
+ }
+
  public List<KnowledgeUnit> findAll() {
   return dslContext.select()
     .from(KNOWLEDGE_UNIT)
