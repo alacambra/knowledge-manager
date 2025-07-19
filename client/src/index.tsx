@@ -29,7 +29,7 @@ import { ConfigProvider } from 'antd';
 
 import { Header } from './components/Header.jsx';
 import { NotFound } from './pages/_404.jsx';
-import { DocumentsManagementPage } from './containers/DocumentsManagementPage.js';
+import { DocumentsManagementPage } from './pages/DocumentsManagementPage.js';
 import { KnowledgeUnitEdit } from './components/KnowledgeUnitForm.js';
 import './style.css';
 import 'antd/dist/reset.css';
