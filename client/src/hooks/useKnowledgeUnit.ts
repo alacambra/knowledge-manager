@@ -119,7 +119,6 @@ export function useKnowledgeUnitEdit(config: UseKnowledgeUnitEditConfig = {}) {
     location.route('/');
   };
 
-  // Creation mode document handlers
   const handleAddDocument = () => {
     location.route(routes.createDocumentPath());
   };

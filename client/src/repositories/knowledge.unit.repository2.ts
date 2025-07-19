@@ -80,13 +80,15 @@ export class KnowledgeUnitRepository2 {
 
  /**
   * Delete a knowledge unit
-  * Note: This method is not available in the current API spec
   */
- static async deleteKnowledgeUnit(id: string): Promise<boolean> {
-  // This endpoint is not available in the current OpenAPI spec
-  // You would need to add DELETE /knowledge-units/{id} to the backend API
-  console.warn('deleteKnowledgeUnit is not implemented in the current API');
-  return false;
+ static async deleteKnowledgeUnit(id: string): Promise<void> {
+  try {
+   const client = this.getApiClient();
+   await client.knowledgeUnitsIdDelete({ id });
+  } catch (error) {
+   console.error('Error deleting knowledge unit:', error);
+   throw new Error('Failed to delete knowledge unit: ' + error.message);
+  }
  }
 
  /**

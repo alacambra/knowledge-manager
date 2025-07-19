@@ -224,6 +224,8 @@ paths:
       responses:
         "204":
           description: No Content
+        "200":
+          description: OK
       summary: Delete Knowledge Unit
       tags:
       - Knowledge Unit Resource

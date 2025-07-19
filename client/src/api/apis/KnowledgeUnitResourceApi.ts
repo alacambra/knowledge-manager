@@ -28,6 +28,10 @@ import {
     KnowledgeUnitWithDocumentsResponseToJSON,
 } from '../models/index';
 
+export interface KnowledgeUnitsIdDeleteRequest {
+    id: string;
+}
+
 export interface KnowledgeUnitsIdGetRequest {
     id: string;
 }
@@ -73,6 +77,42 @@ export class KnowledgeUnitResourceApi extends runtime.BaseAPI {
     async knowledgeUnitsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<KnowledgeUnit>> {
         const response = await this.knowledgeUnitsGetRaw(initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Delete Knowledge Unit
+     */
+    async knowledgeUnitsIdDeleteRaw(requestParameters: KnowledgeUnitsIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling knowledgeUnitsIdDelete().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/knowledge-units/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Delete Knowledge Unit
+     */
+    async knowledgeUnitsIdDelete(requestParameters: KnowledgeUnitsIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.knowledgeUnitsIdDeleteRaw(requestParameters, initOverrides);
     }
 
     /**

@@ -32,13 +32,9 @@ export function useKnowledgeUnitList() {
    content: 'This action cannot be undone.',
    async onOk() {
     try {
-     const success = await KnowledgeUnitRepository.deleteKnowledgeUnit(id);
-     if (success) {
-      setKnowledgeUnits(prev => prev.filter(ku => ku.id !== id));
-      message.success('Knowledge unit deleted successfully');
-     } else {
-      message.error('Failed to delete knowledge unit');
-     }
+     await KnowledgeUnitRepository.deleteKnowledgeUnit(id);
+     setKnowledgeUnits(prev => prev.filter(ku => ku.id !== id));
+     message.success('Knowledge unit deleted successfully');
     } catch (error) {
      message.error('Failed to delete knowledge unit');
     }

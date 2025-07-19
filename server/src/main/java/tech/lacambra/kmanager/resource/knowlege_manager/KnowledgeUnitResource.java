@@ -2,7 +2,9 @@ package tech.lacambra.kmanager.resource.knowlege_manager;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -43,7 +45,7 @@ public class KnowledgeUnitResource {
         return Response.status(Response.Status.OK)
                 .build();
     }
-    
+     
     @GET
     public List<KnowledgeUnit> getKnowledgeUnits() {
         return repository.findAll();
@@ -51,9 +53,15 @@ public class KnowledgeUnitResource {
     
     @GET
     @Path("/{id}")
-    public Response getKnowledgeUnitWithDocuments(@PathParam("id") UUID id) {
+    public KnowledgeUnitWithDocumentsResponse getKnowledgeUnitWithDocuments(@PathParam("id") UUID id) {
         return repository.findByIdWithDocuments(id)
-                .map(kuWithDocs -> Response.ok(kuWithDocs).build())
-                .orElse(Response.status(Response.Status.NOT_FOUND).build());
+                .orElseThrow(() -> new NotFoundException("Knowledge unit not found"));
+    }
+    
+    @DELETE
+    @Path("/{id}")
+    public Response deleteKnowledgeUnit(@PathParam("id") UUID id) {
+        repository.deleteKnowledgeUnit(id);
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 }

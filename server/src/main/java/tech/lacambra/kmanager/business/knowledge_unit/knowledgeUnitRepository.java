@@ -83,4 +83,14 @@ public class KnowledgeUnitRepository {
     .from(KNOWLEDGE_UNIT)
     .fetchInto(KnowledgeUnit.class);
  }
+
+ public void deleteKnowledgeUnit(UUID kuId) {
+  dslContext.deleteFrom(KNOWLEDGE_UNIT_DOCUMENT)
+    .where(KNOWLEDGE_UNIT_DOCUMENT.KNOWLEDGE_UNIT_ID.eq(kuId))
+    .execute();
+  
+  dslContext.deleteFrom(KNOWLEDGE_UNIT)
+    .where(KNOWLEDGE_UNIT.ID.eq(kuId))
+    .execute();
+ }
 }

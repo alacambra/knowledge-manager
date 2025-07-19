@@ -308,6 +308,26 @@
         },
         "summary" : "Get Knowledge Unit With Documents",
         "tags" : [ "Knowledge Unit Resource" ]
+      },
+      "delete" : {
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "summary" : "Delete Knowledge Unit",
+        "tags" : [ "Knowledge Unit Resource" ]
       }
     }
   },
