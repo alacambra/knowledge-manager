@@ -22,7 +22,7 @@ import java.util.UUID;
 @Path("/knowledge-units")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class KnowledgeUnitResource {
+public class KnowledgeUnitManagerResource {
     
     @Inject
     KnowledgeUnitService service;
