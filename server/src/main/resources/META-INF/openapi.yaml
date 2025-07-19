@@ -229,6 +229,20 @@ paths:
       summary: Delete Knowledge Unit
       tags:
       - Knowledge Unit Resource
+  /knowledge-units/{id}/download:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+      summary: Download Knowledge Unit
+      tags:
+      - Knowledge Unit Manager Resource
 components:
   schemas:
     CreateDocumentRequest:

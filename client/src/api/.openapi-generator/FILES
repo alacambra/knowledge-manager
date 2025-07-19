@@ -1,6 +1,7 @@
 apis/DocumentsManagerResourceApi.ts
 apis/GreetingResourceApi.ts
 apis/HelloAIResourceApi.ts
+apis/KnowledgeUnitManagerResourceApi.ts
 apis/KnowledgeUnitResourceApi.ts
 apis/index.ts
 index.ts

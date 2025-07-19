@@ -42,8 +42,26 @@ export function useKnowledgeUnitList() {
   });
  };
 
- const handleDownloadKU = (knowledgeUnit: KnowledgeUnit) => {
-  message.info(`Downloading ${knowledgeUnit.name}...`);
+ const handleDownloadKU = async (knowledgeUnit: KnowledgeUnit) => {
+  try {
+   const { blob, filename } = await KnowledgeUnitRepository.downloadKnowledgeUnit(knowledgeUnit.id);
+   
+   const url = window.URL.createObjectURL(blob);
+   const link = document.createElement('a');
+   link.href = url;
+   link.download = filename;
+   link.setAttribute('target', '_blank');
+   link.setAttribute('rel', 'noopener noreferrer');
+   link.style.display = 'none';
+   document.body.appendChild(link);
+   link.click();
+   document.body.removeChild(link);
+   window.URL.revokeObjectURL(url);
+   
+   message.success(`Downloaded ${knowledgeUnit.name}`);
+  } catch (error) {
+   message.error(`Failed to download ${knowledgeUnit.name}`);
+  }
  };
 
  const handleEditKU = (knowledgeUnit: KnowledgeUnit) => {

@@ -1,11 +1,14 @@
 package tech.lacambra.kmanager.business.knowledge_unit;
 
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.StreamingOutput;
 import tech.lacambra.kmanager.business.documents.DocumentRepository;
 import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitRequest;
 import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitWithDocumentsResponse;
@@ -64,6 +67,27 @@ public class KnowledgeUnitService {
   String finalFilename = determineFilename(knowledgeUnitId, filename);
   
   return fileExportHelper.writeToFile(content, finalFilename);
+ }
+
+ public StreamingOutput generateDownloadStream(UUID knowledgeUnitId) {
+  String content = generateConcatenatedText(knowledgeUnitId);
+  
+  return output -> {
+   try (OutputStreamWriter writer = new OutputStreamWriter(output, StandardCharsets.UTF_8)) {
+    writer.write(content);
+   }
+  };
+ }
+
+ public String generateDownloadFilename(UUID knowledgeUnitId) {
+  KnowledgeUnitWithDocumentsResponse data = knowledgeUnitRepository
+    .findByIdWithDocumentsOrdered(knowledgeUnitId)
+    .orElseThrow(() -> new KnowledgeUnitNotFoundException(knowledgeUnitId));
+  return sanitizeFilename(data.knowledgeUnit().getName()) + ".txt";
+ }
+
+ private String sanitizeFilename(String filename) {
+  return filename.replaceAll("[^a-zA-Z0-9._-]", "_");
  }
 
  private void handleNewDocuments(UUID kuId, KnowledgeUnitRequest request) {

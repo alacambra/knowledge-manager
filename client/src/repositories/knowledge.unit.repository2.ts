@@ -1,4 +1,4 @@
-import { Configuration, KnowledgeUnit, KnowledgeUnitRequest, KnowledgeUnitResourceApi, KnowledgeUnitWithDocumentsResponse } from "../api";
+import { Configuration, KnowledgeUnit, KnowledgeUnitRequest, KnowledgeUnitResourceApi, KnowledgeUnitManagerResourceApi, KnowledgeUnitWithDocumentsResponse } from "../api";
 
 /**
  * KnowledgeUnitRepository2 - Real API implementation using generated client
@@ -8,9 +8,10 @@ import { Configuration, KnowledgeUnit, KnowledgeUnitRequest, KnowledgeUnitResour
  */
 export class KnowledgeUnitRepository2 {
  private static apiClient: KnowledgeUnitResourceApi;
+ private static managerApiClient: KnowledgeUnitManagerResourceApi;
 
  /**
-  * Initialize the API client with configuration
+  * Initialize the main API client with configuration
   */
  private static getApiClient(): KnowledgeUnitResourceApi {
   if (!this.apiClient) {
@@ -23,6 +24,22 @@ export class KnowledgeUnitRepository2 {
    this.apiClient = new KnowledgeUnitResourceApi(config);
   }
   return this.apiClient;
+ }
+
+ /**
+  * Initialize the manager API client for download operations
+  */
+ private static getManagerApiClient(): KnowledgeUnitManagerResourceApi {
+  if (!this.managerApiClient) {
+   const config = new Configuration({
+    basePath: 'http://localhost:8080',
+    headers: {
+     'Content-Type': 'application/json',
+    },
+   });
+   this.managerApiClient = new KnowledgeUnitManagerResourceApi(config);
+  }
+  return this.managerApiClient;
  }
 
  /**
@@ -92,6 +109,31 @@ export class KnowledgeUnitRepository2 {
  }
 
  /**
+  * Download a knowledge unit as a file
+  */
+ static async downloadKnowledgeUnit(id: string): Promise<{ blob: Blob; filename: string }> {
+  try {
+   const client = this.getManagerApiClient();
+   const response = await client.knowledgeUnitsIdDownloadGetRaw({ id });
+   
+   if (!response.raw.ok) {
+    throw new Error(`Download failed with status ${response.raw.status}`);
+   }
+   
+   const blob = await response.raw.blob();
+   const contentDisposition = response.raw.headers.get('Content-Disposition');
+   const filename = contentDisposition 
+    ? contentDisposition.split('filename=')[1]?.replace(/"/g, '')
+    : `knowledge_unit_${id}.txt`;
+   
+   return { blob, filename };
+  } catch (error) {
+   console.error('Error downloading knowledge unit:', error);
+   throw new Error('Failed to download knowledge unit: ' + error.message);
+  }
+ }
+
+ /**
   * Configure the API client with custom settings
   */
  static configure(config: {
@@ -106,5 +148,6 @@ export class KnowledgeUnitRepository2 {
    },
   });
   this.apiClient = new KnowledgeUnitResourceApi(configuration);
+  this.managerApiClient = new KnowledgeUnitManagerResourceApi(configuration);
  }
 }

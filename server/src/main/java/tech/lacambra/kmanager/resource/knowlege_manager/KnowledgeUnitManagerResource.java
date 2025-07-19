@@ -12,6 +12,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 import tech.lacambra.kmanager.business.knowledge_unit.KnowledgeUnitRepository;
 import tech.lacambra.kmanager.business.knowledge_unit.KnowledgeUnitService;
 import tech.lacambra.kmanager.generated.jooq.tables.pojos.KnowledgeUnit;
@@ -63,5 +64,18 @@ public class KnowledgeUnitManagerResource {
     public Response deleteKnowledgeUnit(@PathParam("id") UUID id) {
         repository.deleteKnowledgeUnit(id);
         return Response.status(Response.Status.NO_CONTENT).build();
+    }
+    
+    @GET
+    @Path("/{id}/download")
+    @Produces("application/octet-stream")
+    public Response downloadKnowledgeUnit(@PathParam("id") UUID id) {
+        StreamingOutput stream = service.generateDownloadStream(id);
+        String filename = service.generateDownloadFilename(id);
+        
+        return Response.ok(stream)
+                .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+                .header("Content-Type", "text/plain; charset=utf-8")
+                .build();
     }
 }
