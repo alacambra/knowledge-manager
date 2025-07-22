@@ -3,12 +3,44 @@ import { message } from 'antd';
 import { useLocation } from 'preact-iso';
 import { KnowledgeUnitRepository2 } from '../repositories/knowledge.unit.repository2';
 import { DocumentRepository } from '../repositories/document.repository';
-import type { KnowledgeUnitRequest, DocumentRequest, Document } from '../api/models';
+import type { KnowledgeUnitRequest, DocumentRequest, Document, KnowledgeUnitWithResourcesResponse, DocumentGroup } from '../api/models';
 import { routes } from '..';
 
 interface UseKnowledgeUnitEditConfig {
   onSuccess?: () => void;
   id?: string;
+}
+
+function transformResourcesResponseToDocuments(response: KnowledgeUnitWithResourcesResponse): Document[] {
+  if (!response.resources) {
+    return [];
+  }
+  
+  const documents: Document[] = [];
+  
+  response.resources.forEach(resource => {
+    if (resource.documentGroups) {
+      resource.documentGroups.forEach(documentGroup => {
+        // Transform DocumentGroup to Document for UI compatibility
+        // Note: DocumentGroup has different structure than Document
+        // This mapping may need refinement based on actual domain requirements
+        const document: Document = {
+          id: documentGroup.id,
+          title: documentGroup.uri || 'Untitled Document', // Using URI as title - may need better mapping
+          content: `Document Group: ${documentGroup.uri || 'Unknown'}`, // Placeholder content
+          fileName: documentGroup.uri || 'unknown-file', // Using URI as filename - required property
+          uri: documentGroup.uri,
+          createdAt: documentGroup.createdAt ? (documentGroup.createdAt instanceof Date ? documentGroup.createdAt : new Date(documentGroup.createdAt)) : undefined,
+          updatedAt: documentGroup.updatedAt ? (documentGroup.updatedAt instanceof Date ? documentGroup.updatedAt : new Date(documentGroup.updatedAt)) : undefined,
+          embedding: null,
+          metadata: undefined
+        };
+        documents.push(document);
+      });
+    }
+  });
+  
+  return documents;
 }
 
 export function useKnowledgeUnitEdit(config: UseKnowledgeUnitEditConfig = {}) {
@@ -24,7 +56,7 @@ export function useKnowledgeUnitEdit(config: UseKnowledgeUnitEditConfig = {}) {
   const [documents, setDocuments] = useState<DocumentRequest[]>([]);
 
   // Edit mode state
-  const [kuData, setKuData] = useState<any>(null);
+  const [kuData, setKuData] = useState<KnowledgeUnitWithResourcesResponse | null>(null);
   const [newDocuments, setNewDocuments] = useState<DocumentRequest[]>([]);
   const [allDocuments, setAllDocuments] = useState<Document[]>([]);
   const [addedDocumentIds, setAddedDocumentIds] = useState<string[]>([]);
@@ -44,9 +76,12 @@ export function useKnowledgeUnitEdit(config: UseKnowledgeUnitEditConfig = {}) {
     
     try {
       setLoading(true);
-      const data = await KnowledgeUnitRepository2.getKnowledgeUnitWithDocuments(id);
+      const data = await KnowledgeUnitRepository2.getKnowledgeUnitWithResources(id);
       setKuData(data);
-      setAllDocuments(data.documents);
+      
+      // Transform the hierarchical resources data into a flat documents array for UI compatibility
+      const documents = transformResourcesResponseToDocuments(data);
+      setAllDocuments(documents);
     } catch (error) {
       message.error('Failed to load knowledge unit');
       console.error(error);
@@ -150,8 +185,13 @@ export function useKnowledgeUnitEdit(config: UseKnowledgeUnitEditConfig = {}) {
   };
 
   const handleAddExistingDocument = (documentId: string) => {
+    if (!kuData) return;
+    
+    // Get the transformed documents from the resources
+    const originalDocuments = transformResourcesResponseToDocuments(kuData);
+    
     if (!addedDocumentIds.includes(documentId) &&
-        !kuData?.documents.some((doc: Document) => doc.id === documentId) &&
+        !originalDocuments.some((doc: Document) => doc.id === documentId) &&
         !removedDocumentIds.includes(documentId)) {
       setAddedDocumentIds(prev => [...prev, documentId]);
       // Remove from removed list if it was there
@@ -167,18 +207,27 @@ export function useKnowledgeUnitEdit(config: UseKnowledgeUnitEditConfig = {}) {
   const getCurrentDocuments = () => {
     if (!kuData) return [];
 
+    // Get the transformed documents from the resources
+    const originalDocuments = transformResourcesResponseToDocuments(kuData);
+    
     // Start with original documents
-    let currentDocs = kuData.documents.filter((doc: Document) => !removedDocumentIds.includes(doc.id));
+    let currentDocs = originalDocuments.filter((doc: Document) => !removedDocumentIds.includes(doc.id!)) ?? [];
 
     // Add newly added existing documents
     const addedDocs = allDocuments.filter(doc => addedDocumentIds.includes(doc.id));
     currentDocs = [...currentDocs, ...addedDocs];
 
     // Add new documents (with temporary IDs)
-    const newDocs = newDocuments.map((doc, index) => ({
+    const newDocs: Document[] = newDocuments.map((doc, index) => ({
       id: `new-${index}`,
-      title: doc.name,
-      content: doc.content
+      title: doc.name || 'Untitled Document',
+      content: doc.content || '',
+      fileName: doc.name || `new-document-${index}`,
+      uri: undefined,
+      createdAt: undefined,
+      updatedAt: undefined,
+      embedding: null,
+      metadata: undefined
     }));
     currentDocs = [...currentDocs, ...newDocs];
 
@@ -189,11 +238,14 @@ export function useKnowledgeUnitEdit(config: UseKnowledgeUnitEditConfig = {}) {
   const getAvailableDocuments = () => {
     if (!kuData) return allDocuments;
 
-    const currentDocIds = kuData.documents.map((doc: Document) => doc.id);
+    // Get the transformed documents from the resources
+    const originalDocuments = transformResourcesResponseToDocuments(kuData);
+    const currentDocIds = originalDocuments.map((doc: Document) => doc.id);
+    
     return allDocuments.filter(doc =>
       !currentDocIds.includes(doc.id) &&
       !addedDocumentIds.includes(doc.id) &&
-      removedDocumentIds.includes(doc.id) // Allow re-adding removed documents
+      removedDocumentIds.includes(doc.id!) // Allow re-adding removed documents
     );
   };
 

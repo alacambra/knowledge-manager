@@ -14,6 +14,17 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  KnowledgeUnitWithDocumentsResponse,
+} from '../models/index';
+import {
+    KnowledgeUnitWithDocumentsResponseFromJSON,
+    KnowledgeUnitWithDocumentsResponseToJSON,
+} from '../models/index';
+
+export interface KnowledgeUnitsDeprecatedIdGetRequest {
+    id: string;
+}
 
 export interface KnowledgeUnitsIdDownloadGetRequest {
     id: string;
@@ -23,6 +34,45 @@ export interface KnowledgeUnitsIdDownloadGetRequest {
  * 
  */
 export class KnowledgeUnitManagerResourceApi extends runtime.BaseAPI {
+
+    /**
+     * Get Knowledge Unit With Documents
+     * @deprecated
+     */
+    async knowledgeUnitsDeprecatedIdGetRaw(requestParameters: KnowledgeUnitsDeprecatedIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<KnowledgeUnitWithDocumentsResponse>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling knowledgeUnitsDeprecatedIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/knowledge-units/deprecated/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => KnowledgeUnitWithDocumentsResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Get Knowledge Unit With Documents
+     * @deprecated
+     */
+    async knowledgeUnitsDeprecatedIdGet(requestParameters: KnowledgeUnitsDeprecatedIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<KnowledgeUnitWithDocumentsResponse> {
+        const response = await this.knowledgeUnitsDeprecatedIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Download Knowledge Unit

@@ -17,15 +17,15 @@ import * as runtime from '../runtime';
 import type {
   KnowledgeUnit,
   KnowledgeUnitRequest,
-  KnowledgeUnitWithDocumentsResponse,
+  KnowledgeUnitWithResourcesResponse,
 } from '../models/index';
 import {
     KnowledgeUnitFromJSON,
     KnowledgeUnitToJSON,
     KnowledgeUnitRequestFromJSON,
     KnowledgeUnitRequestToJSON,
-    KnowledgeUnitWithDocumentsResponseFromJSON,
-    KnowledgeUnitWithDocumentsResponseToJSON,
+    KnowledgeUnitWithResourcesResponseFromJSON,
+    KnowledgeUnitWithResourcesResponseToJSON,
 } from '../models/index';
 
 export interface KnowledgeUnitsIdDeleteRequest {
@@ -118,7 +118,7 @@ export class KnowledgeUnitResourceApi extends runtime.BaseAPI {
     /**
      * Get Knowledge Unit With Documents
      */
-    async knowledgeUnitsIdGetRaw(requestParameters: KnowledgeUnitsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<KnowledgeUnitWithDocumentsResponse>> {
+    async knowledgeUnitsIdGetRaw(requestParameters: KnowledgeUnitsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<KnowledgeUnitWithResourcesResponse>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -141,13 +141,13 @@ export class KnowledgeUnitResourceApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => KnowledgeUnitWithDocumentsResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => KnowledgeUnitWithResourcesResponseFromJSON(jsonValue));
     }
 
     /**
      * Get Knowledge Unit With Documents
      */
-    async knowledgeUnitsIdGet(requestParameters: KnowledgeUnitsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<KnowledgeUnitWithDocumentsResponse> {
+    async knowledgeUnitsIdGet(requestParameters: KnowledgeUnitsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<KnowledgeUnitWithResourcesResponse> {
         const response = await this.knowledgeUnitsIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }

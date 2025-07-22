@@ -1,4 +1,4 @@
-import { Configuration, KnowledgeUnit, KnowledgeUnitRequest, KnowledgeUnitResourceApi, KnowledgeUnitManagerResourceApi, KnowledgeUnitWithDocumentsResponse } from "../api";
+import { Configuration, KnowledgeUnit, KnowledgeUnitRequest, KnowledgeUnitResourceApi, KnowledgeUnitManagerResourceApi, KnowledgeUnitWithDocumentsResponse, KnowledgeUnitWithResourcesResponse } from "../api";
 
 /**
  * KnowledgeUnitRepository2 - Real API implementation using generated client
@@ -66,6 +66,20 @@ export class KnowledgeUnitRepository2 {
   } catch (error) {
    console.error('Error fetching knowledge unit:', error);
    throw new Error('Failed to fetch knowledge unit: ' + error.message);
+  }
+ }
+
+ /**
+  * Get a specific knowledge unit by ID with its resources and document groups
+  */
+ static async getKnowledgeUnitWithResources(id: string): Promise<KnowledgeUnitWithResourcesResponse> {
+  try {
+   const client = this.getApiClient();
+   const response: KnowledgeUnitWithResourcesResponse = await client.knowledgeUnitsIdGet({ id });
+   return response;
+  } catch (error) {
+   console.error('Error fetching knowledge unit with resources:', error);
+   throw new Error('Failed to fetch knowledge unit with resources: ' + error.message);
   }
  }
 

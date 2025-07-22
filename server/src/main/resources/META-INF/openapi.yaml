@@ -210,7 +210,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/KnowledgeUnitWithDocumentsResponse"
+                $ref: "#/components/schemas/KnowledgeUnitWithResourcesResponse"
       summary: Get Knowledge Unit With Documents
       tags:
       - Knowledge Unit Resource
@@ -243,6 +243,25 @@ paths:
       summary: Download Knowledge Unit
       tags:
       - Knowledge Unit Manager Resource
+  /knowledge-units/deprecated/{id}:
+    get:
+      deprecated: true
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeUnitWithDocumentsResponse"
+      summary: Get Knowledge Unit With Documents
+      tags:
+      - Knowledge Unit Manager Resource
 components:
   schemas:
     CreateDocumentRequest:
@@ -255,6 +274,7 @@ components:
       required:
       - title
       - content
+      - fileName
       properties:
         id:
           $ref: "#/components/schemas/UUID"
@@ -269,6 +289,10 @@ components:
           $ref: "#/components/schemas/LocalDateTime"
         updatedAt:
           $ref: "#/components/schemas/LocalDateTime"
+        fileName:
+          type: string
+        uri:
+          type: string
     DocumentRequest:
       type: object
       properties:
@@ -342,6 +366,52 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Document"
+    DocumentGroup:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        uri:
+          type: string
+        createdAt:
+          $ref: "#/components/schemas/LocalDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/LocalDateTime"
+      required:
+      - uri
+    KnowledgeUnitResource:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          $ref: "#/components/schemas/LocalDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/LocalDateTime"
+      required:
+      - name
+    KnowledgeUnitResourceWithDocumentGroupsResponse:
+      type: object
+      properties:
+        knowledgeUnitResource:
+          $ref: "#/components/schemas/KnowledgeUnitResource"
+        documentGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentGroup"
+    KnowledgeUnitWithResourcesResponse:
+      type: object
+      properties:
+        knowledgeUnit:
+          $ref: "#/components/schemas/KnowledgeUnit"
+        resources:
+          type: array
+          items:
+            $ref: "#/components/schemas/KnowledgeUnitResourceWithDocumentGroupsResponse"
 info:
   title: Knowledge Manager API
   version: 1.0.0

@@ -7,10 +7,14 @@ apis/index.ts
 index.ts
 models/CreateDocumentRequest.ts
 models/Document.ts
+models/DocumentGroup.ts
 models/DocumentRequest.ts
 models/JSONB.ts
 models/KnowledgeUnit.ts
 models/KnowledgeUnitRequest.ts
+models/KnowledgeUnitResource.ts
+models/KnowledgeUnitResourceWithDocumentGroupsResponse.ts
 models/KnowledgeUnitWithDocumentsResponse.ts
+models/KnowledgeUnitWithResourcesResponse.ts
 models/index.ts
 runtime.ts

@@ -69,6 +69,18 @@ export interface Document {
      * @memberof Document
      */
     updatedAt?: Date;
+    /**
+     * 
+     * @type {string}
+     * @memberof Document
+     */
+    fileName: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Document
+     */
+    uri?: string;
 }
 
 /**
@@ -77,6 +89,7 @@ export interface Document {
 export function instanceOfDocument(value: object): value is Document {
     if (!('title' in value) || value['title'] === undefined) return false;
     if (!('content' in value) || value['content'] === undefined) return false;
+    if (!('fileName' in value) || value['fileName'] === undefined) return false;
     return true;
 }
 
@@ -97,6 +110,8 @@ export function DocumentFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'metadata': json['metadata'] == null ? undefined : JSONBFromJSON(json['metadata']),
         'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
         'updatedAt': json['updatedAt'] == null ? undefined : (new Date(json['updatedAt'])),
+        'fileName': json['fileName'],
+        'uri': json['uri'] == null ? undefined : json['uri'],
     };
 }
 
@@ -118,6 +133,8 @@ export function DocumentToJSONTyped(value?: Document | null, ignoreDiscriminator
         'metadata': JSONBToJSON(value['metadata']),
         'createdAt': value['createdAt'] == null ? undefined : ((value['createdAt']).toISOString()),
         'updatedAt': value['updatedAt'] == null ? undefined : ((value['updatedAt']).toISOString()),
+        'fileName': value['fileName'],
+        'uri': value['uri'],
     };
 }
 
