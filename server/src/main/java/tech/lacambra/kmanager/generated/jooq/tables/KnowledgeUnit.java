@@ -57,7 +57,7 @@ public class KnowledgeUnit extends TableImpl<KnowledgeUnitRecord> {
     /**
      * The column <code>public.knowledge_unit.name</code>.
      */
-    public final TableField<KnowledgeUnitRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(255).nullable(false), this, "");
+    public final TableField<KnowledgeUnitRecord, String> NAME = createField(DSL.name("name"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
      * The column <code>public.knowledge_unit.description</code>.
@@ -67,12 +67,12 @@ public class KnowledgeUnit extends TableImpl<KnowledgeUnitRecord> {
     /**
      * The column <code>public.knowledge_unit.created_at</code>.
      */
-    public final TableField<KnowledgeUnitRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "");
+    public final TableField<KnowledgeUnitRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "");
 
     /**
      * The column <code>public.knowledge_unit.updated_at</code>.
      */
-    public final TableField<KnowledgeUnitRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "");
+    public final TableField<KnowledgeUnitRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "");
 
     private KnowledgeUnit(Name alias, Table<KnowledgeUnitRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

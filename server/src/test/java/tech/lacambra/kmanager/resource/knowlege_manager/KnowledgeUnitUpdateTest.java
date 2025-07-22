@@ -36,7 +36,7 @@ class KnowledgeUnitUpdateTest {
         
         // Step 4: Get one document ID from the KU to remove later
         Response kuResponse = given()
-            .when().get("/knowledge-units/" + kuId)
+            .when().get("/knowledge-units/deprecated/" + kuId)
             .then()
             .statusCode(200)
             .extract().response();
@@ -80,7 +80,7 @@ class KnowledgeUnitUpdateTest {
 
     private void verifyKnowledgeUnitHasDocuments(String kuId, int expectedDocCount, String expectedName, String expectedDescription) {
         given()
-            .when().get("/knowledge-units/" + kuId)
+            .when().get("/knowledge-units/deprecated/" + kuId)
             .then()
             .statusCode(200)
             .body("knowledgeUnit.name", equalTo(expectedName))
@@ -113,7 +113,7 @@ class KnowledgeUnitUpdateTest {
         
         // Get the document ID from the temp KU
         Response kuResponse = given()
-            .when().get("/knowledge-units/" + tempKuId)
+            .when().get("/knowledge-units/deprecated/" + tempKuId)
             .then()
             .statusCode(200)
             .extract().response();
@@ -145,7 +145,7 @@ class KnowledgeUnitUpdateTest {
 
     private void verifyFinalState(String kuId, String addedDocId, String removedDocId) {
         Response response = given()
-            .when().get("/knowledge-units/" + kuId)
+            .when().get("/knowledge-units/deprecated/" + kuId)
             .then()
             .statusCode(200)
             .body("knowledgeUnit.name", equalTo("Updated KU Name"))

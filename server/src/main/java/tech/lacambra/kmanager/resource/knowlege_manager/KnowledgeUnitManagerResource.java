@@ -24,58 +24,66 @@ import java.util.UUID;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class KnowledgeUnitManagerResource {
-    
-    @Inject
-    KnowledgeUnitService service;
-    
-    @Inject
-    KnowledgeUnitRepository repository;
-    
-    @POST
-    public Response createKnowledgeUnit(KnowledgeUnitRequest request) {
-        UUID id = service.createKnowledgeUnit(request);
-        return Response.status(Response.Status.CREATED)
-                .entity(id)
-                .build();
-    }
-    
-    @PUT
-    @Path("/{id}")
-    public Response updateKnowledgeUnit(@PathParam("id") UUID id, KnowledgeUnitRequest request) {
-        service.updateKnowledgeUnit(id, request);
-        return Response.status(Response.Status.OK)
-                .build();
-    }
-     
-    @GET
-    public List<KnowledgeUnit> getKnowledgeUnits() {
-        return repository.findAll();
-    }
-    
-    @GET
-    @Path("/{id}")
-    public KnowledgeUnitWithDocumentsResponse getKnowledgeUnitWithDocuments(@PathParam("id") UUID id) {
-        return repository.findByIdWithDocuments(id)
-                .orElseThrow(() -> new NotFoundException("Knowledge unit not found"));
-    }
-    
-    @DELETE
-    @Path("/{id}")
-    public Response deleteKnowledgeUnit(@PathParam("id") UUID id) {
-        repository.deleteKnowledgeUnit(id);
-        return Response.status(Response.Status.NO_CONTENT).build();
-    }
-    
-    @GET
-    @Path("/{id}/download")
-    @Produces("application/octet-stream")
-    public Response downloadKnowledgeUnit(@PathParam("id") UUID id) {
-        StreamingOutput stream = service.generateDownloadStream(id);
-        String filename = service.generateDownloadFilename(id);
-        
-        return Response.ok(stream)
-                .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
-                .header("Content-Type", "text/plain; charset=utf-8")
-                .build();
-    }
+
+ @Inject
+ KnowledgeUnitService service;
+
+ @Inject
+ KnowledgeUnitRepository repository;
+
+ @POST
+ public Response createKnowledgeUnit(KnowledgeUnitRequest request) {
+  UUID id = service.createKnowledgeUnit(request);
+  return Response.status(Response.Status.CREATED)
+    .entity(id)
+    .build();
+ }
+
+ @PUT
+ @Path("/{id}")
+ public Response updateKnowledgeUnit(@PathParam("id") UUID id, KnowledgeUnitRequest request) {
+  service.updateKnowledgeUnit(id, request);
+  return Response.status(Response.Status.OK)
+    .build();
+ }
+
+ @GET
+ public List<KnowledgeUnit> getKnowledgeUnits() {
+  return repository.findAll();
+ }
+
+ @Deprecated
+ @GET
+ @Path("/deprecated/{id}")
+ public KnowledgeUnitWithDocumentsResponse getKnowledgeUnitWithDocuments(@PathParam("id") UUID id) {
+  return repository.findByIdWithDocumentsOrdered(id)
+    .orElseThrow(() -> new NotFoundException("Knowledge unit not found"));
+ }
+ 
+ @GET
+ @Path("/{id}")
+ public KnowledgeUnitWithResourcesResponse getKnowledgeUnitWithResources(@PathParam("id") UUID id) {
+  return repository.getKnowledgeUnitWithResources(id)
+    .orElseThrow(() -> new NotFoundException("Knowledge unit not found"));
+ }
+
+ @DELETE
+ @Path("/{id}")
+ public Response deleteKnowledgeUnit(@PathParam("id") UUID id) {
+  repository.deleteKnowledgeUnit(id);
+  return Response.status(Response.Status.NO_CONTENT).build();
+ }
+
+ @GET
+ @Path("/{id}/download")
+ @Produces("application/octet-stream")
+ public Response downloadKnowledgeUnit(@PathParam("id") UUID id) {
+  StreamingOutput stream = service.generateDownloadStream(id);
+  String filename = service.generateDownloadFilename(id);
+
+  return Response.ok(stream)
+    .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+    .header("Content-Type", "text/plain; charset=utf-8")
+    .build();
+ }
 }

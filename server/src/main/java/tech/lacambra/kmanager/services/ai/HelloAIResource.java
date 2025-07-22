@@ -277,7 +277,6 @@ public class HelloAIResource {
     private Map<String, Object> createDetailedDocumentSummary(Document document) {
         Map<String, Object> summary = createDocumentSummary(document);
         summary.put("fullContent", document.getContent());
-        summary.put("metadata", document.getMetadata());
         return summary;
     }
 

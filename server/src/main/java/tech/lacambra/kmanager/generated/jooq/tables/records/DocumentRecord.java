@@ -9,7 +9,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import org.jooq.JSONB;
 import org.jooq.impl.TableRecordImpl;
 
 import tech.lacambra.kmanager.generated.jooq.tables.Document;
@@ -53,10 +52,39 @@ public class DocumentRecord extends TableRecordImpl<DocumentRecord> {
     }
 
     /**
+     * Setter for <code>public.document.file_name</code>.
+     */
+    public void setFileName(String value) {
+        set(2, value);
+    }
+
+    /**
+     * Getter for <code>public.document.file_name</code>.
+     */
+    @NotNull
+    public String getFileName() {
+        return (String) get(2);
+    }
+
+    /**
+     * Setter for <code>public.document.uri</code>.
+     */
+    public void setUri(String value) {
+        set(3, value);
+    }
+
+    /**
+     * Getter for <code>public.document.uri</code>.
+     */
+    public String getUri() {
+        return (String) get(3);
+    }
+
+    /**
      * Setter for <code>public.document.content</code>.
      */
     public void setContent(String value) {
-        set(2, value);
+        set(4, value);
     }
 
     /**
@@ -64,7 +92,7 @@ public class DocumentRecord extends TableRecordImpl<DocumentRecord> {
      */
     @NotNull
     public String getContent() {
-        return (String) get(2);
+        return (String) get(4);
     }
 
     /**
@@ -77,7 +105,7 @@ public class DocumentRecord extends TableRecordImpl<DocumentRecord> {
      */
     @Deprecated
     public void setEmbedding(Object value) {
-        set(3, value);
+        set(5, value);
     }
 
     /**
@@ -90,49 +118,35 @@ public class DocumentRecord extends TableRecordImpl<DocumentRecord> {
      */
     @Deprecated
     public Object getEmbedding() {
-        return get(3);
-    }
-
-    /**
-     * Setter for <code>public.document.metadata</code>.
-     */
-    public void setMetadata(JSONB value) {
-        set(4, value);
-    }
-
-    /**
-     * Getter for <code>public.document.metadata</code>.
-     */
-    public JSONB getMetadata() {
-        return (JSONB) get(4);
+        return get(5);
     }
 
     /**
      * Setter for <code>public.document.created_at</code>.
      */
     public void setCreatedAt(LocalDateTime value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>public.document.created_at</code>.
      */
     public LocalDateTime getCreatedAt() {
-        return (LocalDateTime) get(5);
+        return (LocalDateTime) get(6);
     }
 
     /**
      * Setter for <code>public.document.updated_at</code>.
      */
     public void setUpdatedAt(LocalDateTime value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>public.document.updated_at</code>.
      */
     public LocalDateTime getUpdatedAt() {
-        return (LocalDateTime) get(6);
+        return (LocalDateTime) get(7);
     }
 
     // -------------------------------------------------------------------------
@@ -149,14 +163,15 @@ public class DocumentRecord extends TableRecordImpl<DocumentRecord> {
     /**
      * Create a detached, initialised DocumentRecord
      */
-    public DocumentRecord(UUID id, String title, String content, Object embedding, JSONB metadata, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public DocumentRecord(UUID id, String title, String fileName, String uri, String content, Object embedding, LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(Document.DOCUMENT);
 
         setId(id);
         setTitle(title);
+        setFileName(fileName);
+        setUri(uri);
         setContent(content);
         setEmbedding(embedding);
-        setMetadata(metadata);
         setCreatedAt(createdAt);
         setUpdatedAt(updatedAt);
         resetTouchedOnNotNull();
@@ -171,9 +186,10 @@ public class DocumentRecord extends TableRecordImpl<DocumentRecord> {
         if (value != null) {
             setId(value.getId());
             setTitle(value.getTitle());
+            setFileName(value.getFileName());
+            setUri(value.getUri());
             setContent(value.getContent());
             setEmbedding(value.getEmbedding());
-            setMetadata(value.getMetadata());
             setCreatedAt(value.getCreatedAt());
             setUpdatedAt(value.getUpdatedAt());
             resetTouchedOnNotNull();

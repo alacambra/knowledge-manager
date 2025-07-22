@@ -93,19 +93,19 @@ public class KnowledgeUnitService {
  private void handleNewDocuments(UUID kuId, KnowledgeUnitRequest request) {
   if (request.newDocuments() != null && !request.newDocuments().isEmpty()) {
    List<UUID> newDocIds = documentRepository.createDocuments(request.newDocuments());
-   knowledgeUnitRepository.addDocumentsToKU(kuId, newDocIds);
+   knowledgeUnitRepository.addDocumentsToDefaultDocumentGroup(kuId, newDocIds);
   }
  }
 
  private void handleAddingExistingDocuments(UUID kuId, KnowledgeUnitRequest request) {
   if (request.addedDocumentsIds() != null && !request.addedDocumentsIds().isEmpty()) {
-   knowledgeUnitRepository.addDocumentsToKU(kuId, request.addedDocumentsIds());
+   knowledgeUnitRepository.addDocumentsToDefaultDocumentGroup(kuId, request.addedDocumentsIds());
   }
  }
 
  private void handleRemovingDocuments(UUID kuId, KnowledgeUnitRequest request) {
   if (request.removedDocumentsIds() != null && !request.removedDocumentsIds().isEmpty()) {
-   knowledgeUnitRepository.removeDocumentsFromKU(kuId, request.removedDocumentsIds());
+   knowledgeUnitRepository.removeDocumentsFromDefaultDocumentGroup(kuId, request.removedDocumentsIds());
   }
  }
 

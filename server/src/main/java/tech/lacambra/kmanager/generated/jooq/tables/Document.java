@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.JSONB;
 import org.jooq.Name;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
@@ -62,6 +61,16 @@ public class Document extends TableImpl<DocumentRecord> {
     public final TableField<DocumentRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.CLOB.nullable(false), this, "");
 
     /**
+     * The column <code>public.document.file_name</code>.
+     */
+    public final TableField<DocumentRecord, String> FILE_NAME = createField(DSL.name("file_name"), SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
+     * The column <code>public.document.uri</code>.
+     */
+    public final TableField<DocumentRecord, String> URI = createField(DSL.name("uri"), SQLDataType.CLOB, this, "");
+
+    /**
      * The column <code>public.document.content</code>.
      */
     public final TableField<DocumentRecord, String> CONTENT = createField(DSL.name("content"), SQLDataType.CLOB.nullable(false), this, "");
@@ -78,19 +87,14 @@ public class Document extends TableImpl<DocumentRecord> {
     public final TableField<DocumentRecord, Object> EMBEDDING = createField(DSL.name("embedding"), DefaultDataType.getDefaultDataType("\"public\".\"vector\""), this, "");
 
     /**
-     * The column <code>public.document.metadata</code>.
-     */
-    public final TableField<DocumentRecord, JSONB> METADATA = createField(DSL.name("metadata"), SQLDataType.JSONB, this, "");
-
-    /**
      * The column <code>public.document.created_at</code>.
      */
-    public final TableField<DocumentRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "");
+    public final TableField<DocumentRecord, LocalDateTime> CREATED_AT = createField(DSL.name("created_at"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "");
 
     /**
      * The column <code>public.document.updated_at</code>.
      */
-    public final TableField<DocumentRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "");
+    public final TableField<DocumentRecord, LocalDateTime> UPDATED_AT = createField(DSL.name("updated_at"), SQLDataType.LOCALDATETIME(6).nullable(false).defaultValue(DSL.field(DSL.raw("CURRENT_TIMESTAMP"), SQLDataType.LOCALDATETIME)), this, "");
 
     private Document(Name alias, Table<DocumentRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

@@ -65,11 +65,12 @@ public class DocumentRepository {
 
  public List<UUID> createDocuments(List<DocumentRequest> documents) {
   return dsl.insertInto(DOCUMENT)
-    .columns(DOCUMENT.TITLE, DOCUMENT.CONTENT)
+    .columns(DOCUMENT.TITLE, DOCUMENT.FILE_NAME, DOCUMENT.CONTENT)
     .valuesOfRows(documents.stream()
       .map(doc -> {
        return DSL.row(
          doc.name(),
+         doc.name(), // Use name as filename for now
          doc.content());
       })
       .toList())
@@ -169,8 +170,8 @@ public class DocumentRepository {
   try {
 
    Document doc = dsl
-     .insertInto(DOCUMENT, DOCUMENT.TITLE, DOCUMENT.CONTENT, DOCUMENT.EMBEDDING, DOCUMENT.METADATA)
-     .values(title, content, DSL.field("{0}::vector", sqlVector), JSONB.valueOf("{}"))
+     .insertInto(DOCUMENT, DOCUMENT.TITLE, DOCUMENT.CONTENT, DOCUMENT.EMBEDDING)
+     .values(title, content, DSL.field("{0}::vector", sqlVector))
      .returning()
      .fetchOneInto(Document.class);
 

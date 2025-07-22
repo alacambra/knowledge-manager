@@ -13,9 +13,13 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SchemaImpl;
 
 import tech.lacambra.kmanager.generated.jooq.tables.Document;
+import tech.lacambra.kmanager.generated.jooq.tables.DocumentGroup;
+import tech.lacambra.kmanager.generated.jooq.tables.DocumentGroupDocument;
 import tech.lacambra.kmanager.generated.jooq.tables.DocumentTemplates;
 import tech.lacambra.kmanager.generated.jooq.tables.KnowledgeUnit;
-import tech.lacambra.kmanager.generated.jooq.tables.KnowledgeUnitDocument;
+import tech.lacambra.kmanager.generated.jooq.tables.KnowledgeUnitContainedResource;
+import tech.lacambra.kmanager.generated.jooq.tables.KnowledgeUnitResource;
+import tech.lacambra.kmanager.generated.jooq.tables.ResourceContainedDocumentGroup;
 
 
 /**
@@ -48,9 +52,13 @@ public class Public extends SchemaImpl {
     public final List<Table<?>> getTables() {
         return Arrays.asList(
             Document.DOCUMENT,
+            DocumentGroup.DOCUMENT_GROUP,
+            DocumentGroupDocument.DOCUMENT_GROUP_DOCUMENT,
             DocumentTemplates.DOCUMENT_TEMPLATES,
             KnowledgeUnit.KNOWLEDGE_UNIT,
-            KnowledgeUnitDocument.KNOWLEDGE_UNIT_DOCUMENT
+            KnowledgeUnitContainedResource.KNOWLEDGE_UNIT_CONTAINED_RESOURCE,
+            KnowledgeUnitResource.KNOWLEDGE_UNIT_RESOURCE,
+            ResourceContainedDocumentGroup.RESOURCE_CONTAINED_DOCUMENT_GROUP
         );
     }
 }
