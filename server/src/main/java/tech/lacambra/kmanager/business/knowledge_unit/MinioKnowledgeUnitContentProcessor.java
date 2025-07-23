@@ -70,6 +70,14 @@ public class MinioKnowledgeUnitContentProcessor {
     throw new ContentProcessingException("No PDF files found to process");
    }
 
+   return processKnowledgeUnitUris(pdfStreams);
+  } catch (Exception e) {
+   throw new ContentProcessingException("Failed to process knowledge unit content", e);
+  }
+ }
+
+ byte[] processKnowledgeUnitUris(List<InputStream> pdfStreams) {
+  try {
    return pdfMergerTransformer.transform(pdfStreams);
   } catch (Exception e) {
    throw new ContentProcessingException("Failed to process knowledge unit content", e);
@@ -147,7 +155,7 @@ public class MinioKnowledgeUnitContentProcessor {
     if (isPdfSupportedFileType(fileInfo.getObjectName())) {
      InputStream metadataPage = createMetadataPage(uri, fileInfo);
      pdfStreams.add(metadataPage);
-     
+
      InputStream pdfStream = uriResolver.getFileInputStream(uri, fileInfo.getObjectName());
      pdfStreams.add(pdfStream);
     }
@@ -160,7 +168,7 @@ public class MinioKnowledgeUnitContentProcessor {
 
  private InputStream createMetadataPage(String uri, MinioScanService.MinioFileInfo fileInfo) {
   try (PDDocument document = new PDDocument();
-     ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
    PDPage page = new PDPage();
    document.addPage(page);
@@ -182,7 +190,8 @@ public class MinioKnowledgeUnitContentProcessor {
     contentStream.showText("File Size: " + fileInfo.getSize() + " bytes");
     contentStream.newLineAtOffset(0, -20);
     if (fileInfo.getLastModified() != null) {
-     contentStream.showText("Last Modified: " + fileInfo.getLastModified().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+     contentStream
+       .showText("Last Modified: " + fileInfo.getLastModified().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
     }
     contentStream.newLineAtOffset(0, -20);
     contentStream.showText("ETag: " + fileInfo.getEtag());

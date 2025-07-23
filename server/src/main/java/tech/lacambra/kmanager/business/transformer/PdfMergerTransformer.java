@@ -27,23 +27,48 @@ public class PdfMergerTransformer implements Transformer<byte[]> {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              PDDocument mergedDocument = new PDDocument()) {
 
-            for (int i = 0; i < inputStreams.size(); i++) {
-                InputStream inputStream = inputStreams.get(i);
+            // Keep all source documents open until after we save
+            List<PDDocument> sourceDocuments = new java.util.ArrayList<>();
+            
+            try {
+                // Load all documents first
+                for (int i = 0; i < inputStreams.size(); i++) {
+                    InputStream inputStream = inputStreams.get(i);
+                    
+                    try {
+                        PDDocument document = Loader.loadPDF(inputStream.readAllBytes());
+                        sourceDocuments.add(document);
+                        logger.info("Loaded PDF document {} (pages: {})", i + 1, document.getNumberOfPages());
+                    } catch (IOException e) {
+                        logger.error("Failed to load PDF document {}: {}", i + 1, e.getMessage());
+                        throw new TransformerException("Failed to load PDF document " + (i + 1), e);
+                    }
+                }
                 
-                try (PDDocument document = Loader.loadPDF(inputStream.readAllBytes())) {
-                    logger.debug("Adding PDF document {} to merger (pages: {})", i + 1, document.getNumberOfPages());
+                // Import pages from all documents
+                for (int i = 0; i < sourceDocuments.size(); i++) {
+                    PDDocument document = sourceDocuments.get(i);
+                    logger.info("Adding PDF document {} to merger (pages: {})", i + 1, document.getNumberOfPages());
                     
                     for (int pageIndex = 0; pageIndex < document.getNumberOfPages(); pageIndex++) {
-                        mergedDocument.addPage(document.getPage(pageIndex));
+                        mergedDocument.importPage(document.getPage(pageIndex));
                     }
-                } catch (IOException e) {
-                    logger.error("Failed to load PDF document {}: {}", i + 1, e.getMessage());
-                    throw new TransformerException("Failed to load PDF document " + (i + 1), e);
+                }
+
+                // Save the merged document while source documents are still open
+                mergedDocument.save(outputStream);
+                logger.info("PDF merge completed successfully. Output size: {} bytes", outputStream.size());
+                
+            } finally {
+                // Close all source documents
+                for (PDDocument doc : sourceDocuments) {
+                    try {
+                        doc.close();
+                    } catch (IOException e) {
+                        logger.warn("Failed to close source document: {}", e.getMessage());
+                    }
                 }
             }
-
-            mergedDocument.save(outputStream);
-            logger.info("PDF merge completed successfully. Output size: {} bytes", outputStream.size());
             
             return outputStream.toByteArray();
 
