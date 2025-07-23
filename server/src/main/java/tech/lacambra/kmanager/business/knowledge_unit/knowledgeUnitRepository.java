@@ -9,6 +9,7 @@ import static tech.lacambra.kmanager.generated.jooq.tables.DocumentGroupDocument
 import static tech.lacambra.kmanager.generated.jooq.tables.Document.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +31,7 @@ import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitWithDocumen
 import java.util.Optional;
 
 @ApplicationScoped
+@Transactional
 public class KnowledgeUnitRepository {
 
  private DSLContext dslContext;

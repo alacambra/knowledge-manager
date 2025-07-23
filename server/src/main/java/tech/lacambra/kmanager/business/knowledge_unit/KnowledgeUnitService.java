@@ -1,6 +1,5 @@
 package tech.lacambra.kmanager.business.knowledge_unit;
 
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
