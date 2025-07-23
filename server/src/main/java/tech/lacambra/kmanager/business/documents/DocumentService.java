@@ -6,7 +6,6 @@ import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import tech.lacambra.kmanager.generated.jooq.tables.pojos.Document;
-import tech.lacambra.kmanager.resource.knowlege_manager.DocumentGroupRequest;
 
 @ApplicationScoped
 public class DocumentService {
@@ -24,6 +23,10 @@ public class DocumentService {
 
     public List<Document> getAllDocuments() {
         return documentRepository.getAllDocuments();
+    }
+
+    public void updateDocumentGroup(UUID documentGroupId, DocumentGroupInput input) {
+        documentRepository.updateDocumentGroup(documentGroupId, input);
     }
 
     public boolean removeDocument(UUID documentId) {

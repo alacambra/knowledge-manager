@@ -74,6 +74,13 @@ public class DocumentRepositoryOld {
   return documentGroupId;
  }
 
+ public void updateDocumentGroup(UUID documentGroupId, DocumentGroupInput input) {
+  dsl.update(DOCUMENT_GROUP)
+    .set(DOCUMENT_GROUP.URI, input.uri())
+    .where(DOCUMENT_GROUP.ID.eq(documentGroupId))
+    .execute();
+ }
+
  // public List<UUID> createDocuments(List<DocumentGroupRequest> documents) {
  //  return dsl.insertInto(DOCUMENT)
  //    .columns(DOCUMENT.TITLE, DOCUMENT.FILE_NAME, DOCUMENT.CONTENT)

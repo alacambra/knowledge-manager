@@ -86,4 +86,20 @@ public class KnowledgeUnitManagerResource {
     .header("Content-Type", "text/plain; charset=utf-8")
     .build();
  }
+
+ @GET
+ @Path("/{id}/generate-text")
+ @Produces(MediaType.TEXT_PLAIN)
+ public Response generateTextConcatenation(@PathParam("id") UUID id) {
+  String content = service.generateConcatenatedText(id);
+  return Response.ok(content).build();
+ }
+
+ @GET
+ @Path("/{id}/generate-pdf")
+ @Produces("application/pdf")
+ public Response generatePdfConcatenation(@PathParam("id") UUID id) {
+  byte[] pdfContent = service.generateConcatenatedPDF(id);
+  return Response.ok(pdfContent).build();
+ }
 }

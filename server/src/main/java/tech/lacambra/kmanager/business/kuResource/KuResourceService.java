@@ -6,31 +6,31 @@ import static tech.lacambra.kmanager.generated.jooq.tables.KnowledgeUnitResource
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import org.jooq.impl.DSL;
+import org.jooq.DSLContext;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+@ApplicationScoped
 public class KuResourceService {
 
- private DSL dslContext;
+ private DSLContext dslContext;
+ private KuResourceRepository kuResourceRepository;
 
  @Inject
- public KuResourceService(DSL dslContext) {
+ public KuResourceService(DSLContext dslContext, KuResourceRepository kuResourceRepository) {
   this.dslContext = dslContext;
+  this.kuResourceRepository = kuResourceRepository;
+ }
+
+ public void updateKuResource(UUID kuResourceId, KuResourceInput input) {
+  kuResourceRepository.updateKuResource(kuResourceId, input);
  }
 
  public void addDocumentGroupToKuResource(UUID kurId, UUID dgId) {
-  addDocumentGroupsToKuResource(kurId, Collections.singletonList(dgId));
+  kuResourceRepository.addDocumentGroupToKuResource(kurId, dgId);
  }
 
- public void addDocumentGroupsToKuResource(UUID kurId, List<UUID> dgid) {
-
-  var idRecords = dgid.stream()
-    .map(id -> org.jooq.impl.DSL.row(kurId, id))
-    .toArray(org.jooq.Row2[]::new);
-
-  dslContext.insertInto(KNOWLEDGE_UNIT_RESOURCE)
-    .columns(KNOWLEDGE_UNIT_RESOURCE.ID, DOCUMENT_GROUP_DOCUMENT.ID)
-    .valuesOfRows(idRecords)
-    .execute();
+ public void addDocumentGroupsToKuResource(UUID kurId, List<UUID> dgIds) {
+  kuResourceRepository.addDocumentGroupsToKuResource(kurId, dgIds);
  }
 }

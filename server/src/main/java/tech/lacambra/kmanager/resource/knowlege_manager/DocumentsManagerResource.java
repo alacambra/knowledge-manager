@@ -5,11 +5,13 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import tech.lacambra.kmanager.business.documents.DocumentGroupInput;
 import tech.lacambra.kmanager.business.documents.DocumentService;
 import tech.lacambra.kmanager.generated.jooq.tables.pojos.Document;
 
@@ -36,6 +38,13 @@ public class DocumentsManagerResource {
     @GET
     public List<Document> getAllDocuments() {
         return documentService.getAllDocuments();
+    }
+    
+    @PUT
+    @Path("/groups/{id}")
+    public Response updateDocumentGroup(@PathParam("id") UUID documentGroupId, DocumentGroupInput input) {
+        documentService.updateDocumentGroup(documentGroupId, input);
+        return Response.status(Response.Status.OK).build();
     }
     
     @DELETE

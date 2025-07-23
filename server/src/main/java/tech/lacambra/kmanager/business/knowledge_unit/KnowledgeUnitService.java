@@ -1,5 +1,6 @@
 package tech.lacambra.kmanager.business.knowledge_unit;
 
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -62,7 +63,9 @@ public class KnowledgeUnitService {
  public void updateKnowledgeUnit(UUID kuId, KnowledgeUnitRequest knowledgeUnitRequest) {
   updateKnowledgeUnitBasicInfo(kuId, knowledgeUnitRequest);
 
-  handleKuResources(kuId, knowledgeUnitRequest);
+  if (knowledgeUnitRequest.kuResourceRequests() != null && !knowledgeUnitRequest.kuResourceRequests().isEmpty()) {
+   handleKuResourcesForUpdate(kuId, knowledgeUnitRequest);
+  }
  }
 
  public String generateConcatenatedText(UUID knowledgeUnitId) {
@@ -71,6 +74,64 @@ public class KnowledgeUnitService {
     .orElseThrow(() -> new KnowledgeUnitNotFoundException(knowledgeUnitId));
 
   return minioContentProcessor.processKnowledgeUnitToText(data);
+ }
+ 
+ public byte[] generateConcatenatedPDF(UUID knowledgeUnitId) {
+  KnowledgeUnitWithDocumentGroupUrisResponse data = knowledgeUnitRepository
+    .findByIdWithDocumentGroupUris(knowledgeUnitId)
+    .orElseThrow(() -> new KnowledgeUnitNotFoundException(knowledgeUnitId));
+
+  return minioContentProcessor.processKnowledgeUnitToPdf(data);
+ }
+
+ public boolean hasPdfFiles(UUID knowledgeUnitId) {
+  KnowledgeUnitWithDocumentGroupUrisResponse data = knowledgeUnitRepository
+    .findByIdWithDocumentGroupUris(knowledgeUnitId)
+    .orElseThrow(() -> new KnowledgeUnitNotFoundException(knowledgeUnitId));
+
+  if (data.documentGroupUris() == null || data.documentGroupUris().isEmpty()) {
+   return false;
+  }
+
+  for (String uri : data.documentGroupUris()) {
+   try {
+    List<MinioScanService.MinioFileInfo> files = documentGroupUriResolver.scanMinioPath(uri);
+    for (MinioScanService.MinioFileInfo fileInfo : files) {
+     if (isPdfFile(fileInfo.getObjectName())) {
+      return true;
+     }
+    }
+   } catch (Exception e) {
+    throw new RuntimeException("Failed to scan MinIO path: " + uri, e);
+   }
+  }
+
+  return false;
+ }
+
+ public boolean hasTextFiles(UUID knowledgeUnitId) {
+  KnowledgeUnitWithDocumentGroupUrisResponse data = knowledgeUnitRepository
+    .findByIdWithDocumentGroupUris(knowledgeUnitId)
+    .orElseThrow(() -> new KnowledgeUnitNotFoundException(knowledgeUnitId));
+
+  if (data.documentGroupUris() == null || data.documentGroupUris().isEmpty()) {
+   return false;
+  }
+
+  for (String uri : data.documentGroupUris()) {
+   try {
+    List<MinioScanService.MinioFileInfo> files = documentGroupUriResolver.scanMinioPath(uri);
+    for (MinioScanService.MinioFileInfo fileInfo : files) {
+     if (isTextFile(fileInfo.getObjectName())) {
+      return true;
+     }
+    }
+   } catch (Exception e) {
+    throw new RuntimeException("Failed to scan MinIO path: " + uri, e);
+   }
+  }
+
+  return false;
  }
 
  public Path exportToFile(UUID knowledgeUnitId, String filename) {
@@ -123,6 +184,26 @@ public class KnowledgeUnitService {
   return filename.replaceAll("[^a-zA-Z0-9._-]", "_");
  }
 
+ private boolean isPdfFile(String fileName) {
+  String extension = getFileExtension(fileName);
+  return "pdf".equalsIgnoreCase(extension);
+ }
+
+ private boolean isTextFile(String fileName) {
+  String extension = getFileExtension(fileName);
+  return switch (extension.toLowerCase()) {
+   case "txt", "md", "java", "js", "ts", "json", "xml", "yaml", "yml", "properties" -> true;
+   default -> false;
+  };
+ }
+
+ private String getFileExtension(String fileName) {
+  if (fileName == null || !fileName.contains(".")) {
+   return "";
+  }
+  return fileName.substring(fileName.lastIndexOf(".") + 1);
+ }
+
  private void handleKuResources(UUID kuId, KnowledgeUnitRequest request) {
   if (request.kuResourceRequests() != null && !request.kuResourceRequests().isEmpty()) {
    for (KuResourceRequest kuResourceRequest : request.kuResourceRequests()) {
@@ -137,6 +218,17 @@ public class KnowledgeUnitService {
    UUID kurId = kuResourceRepository.createKuResource(
      new KuResourceInput("Default Resource", "Default resource for knowledge unit"));
    knowledgeUnitRepository.addKuResourceToKnowledgeUnit(kuId, kurId);
+  }
+ }
+
+ private void handleKuResourcesForUpdate(UUID kuId, KnowledgeUnitRequest request) {
+  for (KuResourceRequest kuResourceRequest : request.kuResourceRequests()) {
+   UUID kurId = kuResourceRepository.createKuResource(
+     new KuResourceInput(kuResourceRequest.name(), kuResourceRequest.description()));
+   
+   knowledgeUnitRepository.addKuResourceToKnowledgeUnit(kuId, kurId);
+   
+   handleDocumentGroupsForKuResource(kurId, kuResourceRequest);
   }
  }
 

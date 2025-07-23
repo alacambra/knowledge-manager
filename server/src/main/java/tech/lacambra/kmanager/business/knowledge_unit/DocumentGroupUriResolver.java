@@ -41,6 +41,13 @@ public class DocumentGroupUriResolver {
   }
  }
 
+ public InputStream getFileInputStream(String uri, String objectName) {
+  String[] parts = parseUri(uri);
+  String bucketName = parts[0];
+
+  return minioScanService.getFileContent(bucketName, objectName);
+ }
+
  private String[] parseUri(String uri) {
   if (uri == null || uri.isEmpty()) {
    throw new IllegalArgumentException("URI cannot be null or empty");
