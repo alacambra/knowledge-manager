@@ -25,6 +25,7 @@ import tech.lacambra.kmanager.generated.jooq.tables.pojos.Document;
 import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitResourceWithDocumentGroupsResponse;
 import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitWithDocumentsResponse;
 import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitWithResourcesResponse;
+import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitWithDocumentGroupUrisResponse;
 
 import java.util.Optional;
 
@@ -127,6 +128,28 @@ public class KnowledgeUnitRepository {
     .fetchInto(Document.class);
 
   return Optional.of(new KnowledgeUnitWithDocumentsResponse(ku, documents));
+ }
+
+ public Optional<KnowledgeUnitWithDocumentGroupUrisResponse> findByIdWithDocumentGroupUris(UUID kuId) {
+  KnowledgeUnit ku = dslContext.select()
+    .from(KNOWLEDGE_UNIT)
+    .where(KNOWLEDGE_UNIT.ID.eq(kuId))
+    .fetchOneInto(KnowledgeUnit.class);
+
+  if (ku == null) {
+   return Optional.empty();
+  }
+
+  List<String> documentGroupUris = dslContext.select(DOCUMENT_GROUP.URI)
+    .from(DOCUMENT_GROUP)
+    .join(RESOURCE_CONTAINED_DOCUMENT_GROUP).on(DOCUMENT_GROUP.ID.eq(RESOURCE_CONTAINED_DOCUMENT_GROUP.DOCUMENT_GROUP_ID))
+    .join(KNOWLEDGE_UNIT_RESOURCE).on(RESOURCE_CONTAINED_DOCUMENT_GROUP.KNOWLEDGE_UNIT_RESOURCE_ID.eq(KNOWLEDGE_UNIT_RESOURCE.ID))
+    .join(KNOWLEDGE_UNIT_CONTAINED_RESOURCE).on(KNOWLEDGE_UNIT_RESOURCE.ID.eq(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_RESOURCE_ID))
+    .where(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_ID.eq(kuId))
+    .orderBy(KNOWLEDGE_UNIT_RESOURCE.CREATED_AT.asc(), DOCUMENT_GROUP.CREATED_AT.asc())
+    .fetchInto(String.class);
+
+  return Optional.of(new KnowledgeUnitWithDocumentGroupUrisResponse(ku, documentGroupUris));
  }
 
  public List<KnowledgeUnit> findAll() {

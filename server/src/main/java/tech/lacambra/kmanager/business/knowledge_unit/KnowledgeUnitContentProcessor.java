@@ -10,6 +10,7 @@ import tech.lacambra.kmanager.generated.jooq.tables.pojos.KnowledgeUnit;
 import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitWithDocumentsResponse;
 import tech.lacambra.kmanager.util.ContentCleanupUtil;
 
+@Deprecated
 @ApplicationScoped
 public class KnowledgeUnitContentProcessor {
 

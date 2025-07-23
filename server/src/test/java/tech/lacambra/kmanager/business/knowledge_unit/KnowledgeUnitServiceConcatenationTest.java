@@ -12,9 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import tech.lacambra.kmanager.generated.jooq.tables.pojos.Document;
 import tech.lacambra.kmanager.generated.jooq.tables.pojos.KnowledgeUnit;
-import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitWithDocumentsResponse;
+import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitWithDocumentGroupUrisResponse;
 import tech.lacambra.kmanager.business.documents.DocumentRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,7 +29,7 @@ class KnowledgeUnitServiceConcatenationTest {
     private DocumentRepository documentRepository;
 
     @Mock
-    private KnowledgeUnitContentProcessor contentProcessor;
+    private MinioKnowledgeUnitContentProcessor minioContentProcessor;
 
     @Mock
     private FileExportHelper fileExportHelper;
@@ -42,7 +41,7 @@ class KnowledgeUnitServiceConcatenationTest {
         knowledgeUnitService = new KnowledgeUnitService(
             knowledgeUnitRepository,
             documentRepository,
-            contentProcessor,
+            minioContentProcessor,
             fileExportHelper
         );
     }
@@ -58,44 +57,34 @@ class KnowledgeUnitServiceConcatenationTest {
         ku.setCreatedAt(LocalDateTime.now());
         ku.setUpdatedAt(LocalDateTime.now());
 
-        Document doc1 = new Document();
-        doc1.setId(UUID.randomUUID());
-        doc1.setTitle("Document 1");
-        doc1.setContent("Content 1");
+        List<String> documentGroupUris = List.of("test-bucket/path1", "test-bucket/path2");
+        KnowledgeUnitWithDocumentGroupUrisResponse response = new KnowledgeUnitWithDocumentGroupUrisResponse(ku, documentGroupUris);
 
-        Document doc2 = new Document();
-        doc2.setId(UUID.randomUUID());
-        doc2.setTitle("Document 2");
-        doc2.setContent("Content 2");
-
-        List<Document> documents = List.of(doc1, doc2);
-        KnowledgeUnitWithDocumentsResponse response = new KnowledgeUnitWithDocumentsResponse(ku, documents);
-
-        when(knowledgeUnitRepository.findByIdWithDocumentsOrdered(kuId))
+        when(knowledgeUnitRepository.findByIdWithDocumentGroupUris(kuId))
             .thenReturn(Optional.of(response));
-        when(contentProcessor.processKnowledgeUnitToText(response))
-            .thenReturn("Concatenated content");
+        when(minioContentProcessor.processKnowledgeUnitToText(response))
+            .thenReturn("MinIO concatenated content");
 
         String result = knowledgeUnitService.generateConcatenatedText(kuId);
 
-        assertEquals("Concatenated content", result);
-        verify(knowledgeUnitRepository).findByIdWithDocumentsOrdered(kuId);
-        verify(contentProcessor).processKnowledgeUnitToText(response);
+        assertEquals("MinIO concatenated content", result);
+        verify(knowledgeUnitRepository).findByIdWithDocumentGroupUris(kuId);
+        verify(minioContentProcessor).processKnowledgeUnitToText(response);
     }
 
     @Test
     void generateConcatenatedText_knowledgeUnitNotFound() {
         UUID kuId = UUID.randomUUID();
 
-        when(knowledgeUnitRepository.findByIdWithDocumentsOrdered(kuId))
+        when(knowledgeUnitRepository.findByIdWithDocumentGroupUris(kuId))
             .thenReturn(Optional.empty());
 
         assertThrows(KnowledgeUnitNotFoundException.class, () -> {
             knowledgeUnitService.generateConcatenatedText(kuId);
         });
 
-        verify(knowledgeUnitRepository).findByIdWithDocumentsOrdered(kuId);
-        verifyNoInteractions(contentProcessor);
+        verify(knowledgeUnitRepository).findByIdWithDocumentGroupUris(kuId);
+        verifyNoInteractions(minioContentProcessor);
     }
 
     @Test
@@ -107,11 +96,11 @@ class KnowledgeUnitServiceConcatenationTest {
         ku.setId(kuId);
         ku.setName("Test KU");
 
-        KnowledgeUnitWithDocumentsResponse response = new KnowledgeUnitWithDocumentsResponse(ku, List.of());
+        KnowledgeUnitWithDocumentGroupUrisResponse response = new KnowledgeUnitWithDocumentGroupUrisResponse(ku, List.of());
 
-        when(knowledgeUnitRepository.findByIdWithDocumentsOrdered(kuId))
+        when(knowledgeUnitRepository.findByIdWithDocumentGroupUris(kuId))
             .thenReturn(Optional.of(response));
-        when(contentProcessor.processKnowledgeUnitToText(response))
+        when(minioContentProcessor.processKnowledgeUnitToText(response))
             .thenReturn("Export content");
         when(fileExportHelper.writeToFile("Export content", customFilename))
             .thenReturn(Path.of("exports/custom-export.txt"));
@@ -131,11 +120,11 @@ class KnowledgeUnitServiceConcatenationTest {
         ku.setId(kuId);
         ku.setName("Test KU");
 
-        KnowledgeUnitWithDocumentsResponse response = new KnowledgeUnitWithDocumentsResponse(ku, List.of());
+        KnowledgeUnitWithDocumentGroupUrisResponse response = new KnowledgeUnitWithDocumentGroupUrisResponse(ku, List.of());
 
-        when(knowledgeUnitRepository.findByIdWithDocumentsOrdered(kuId))
+        when(knowledgeUnitRepository.findByIdWithDocumentGroupUris(kuId))
             .thenReturn(Optional.of(response));
-        when(contentProcessor.processKnowledgeUnitToText(response))
+        when(minioContentProcessor.processKnowledgeUnitToText(response))
             .thenReturn("Export content");
         when(fileExportHelper.generateDefaultFilename("Test KU"))
             .thenReturn("Test_KU-20240719-120000.txt");

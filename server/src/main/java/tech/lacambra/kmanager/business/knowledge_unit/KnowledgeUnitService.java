@@ -12,23 +12,24 @@ import jakarta.ws.rs.core.StreamingOutput;
 import tech.lacambra.kmanager.business.documents.DocumentRepository;
 import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitRequest;
 import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitWithDocumentsResponse;
+import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitWithDocumentGroupUrisResponse;
 
 @ApplicationScoped
 public class KnowledgeUnitService {
 
  private final KnowledgeUnitRepository knowledgeUnitRepository;
  private final DocumentRepository documentRepository;
- private final KnowledgeUnitContentProcessor contentProcessor;
+ private final MinioKnowledgeUnitContentProcessor minioContentProcessor;
  private final FileExportHelper fileExportHelper;
 
  @Inject
  public KnowledgeUnitService(KnowledgeUnitRepository knowledgeUnitRepository, 
                            DocumentRepository documentRepository,
-                           KnowledgeUnitContentProcessor contentProcessor,
+                           MinioKnowledgeUnitContentProcessor minioContentProcessor,
                            FileExportHelper fileExportHelper) {
   this.knowledgeUnitRepository = knowledgeUnitRepository;
   this.documentRepository = documentRepository;
-  this.contentProcessor = contentProcessor;
+  this.minioContentProcessor = minioContentProcessor;
   this.fileExportHelper = fileExportHelper;
  }
 
@@ -54,11 +55,11 @@ public class KnowledgeUnitService {
  }
 
  public String generateConcatenatedText(UUID knowledgeUnitId) {
-  KnowledgeUnitWithDocumentsResponse data = knowledgeUnitRepository
-    .findByIdWithDocumentsOrdered(knowledgeUnitId)
+  KnowledgeUnitWithDocumentGroupUrisResponse data = knowledgeUnitRepository
+    .findByIdWithDocumentGroupUris(knowledgeUnitId)
     .orElseThrow(() -> new KnowledgeUnitNotFoundException(knowledgeUnitId));
   
-  return contentProcessor.processKnowledgeUnitToText(data);
+  return minioContentProcessor.processKnowledgeUnitToText(data);
  }
 
  public Path exportToFile(UUID knowledgeUnitId, String filename) {
@@ -80,8 +81,8 @@ public class KnowledgeUnitService {
  }
 
  public String generateDownloadFilename(UUID knowledgeUnitId) {
-  KnowledgeUnitWithDocumentsResponse data = knowledgeUnitRepository
-    .findByIdWithDocumentsOrdered(knowledgeUnitId)
+  KnowledgeUnitWithDocumentGroupUrisResponse data = knowledgeUnitRepository
+    .findByIdWithDocumentGroupUris(knowledgeUnitId)
     .orElseThrow(() -> new KnowledgeUnitNotFoundException(knowledgeUnitId));
   return sanitizeFilename(data.knowledgeUnit().getName()) + ".txt";
  }
