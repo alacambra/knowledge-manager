@@ -15,16 +15,17 @@ import org.jooq.Param;
 import org.jooq.impl.DSL;
 
 import tech.lacambra.kmanager.generated.jooq.tables.pojos.Document;
-import tech.lacambra.kmanager.resource.knowlege_manager.DocumentRequest;
 import tech.lacambra.kmanager.services.ai.EmbeddingService;
 
 import static tech.lacambra.kmanager.generated.jooq.tables.Document.*;
+import static tech.lacambra.kmanager.generated.jooq.tables.DocumentGroup.DOCUMENT_GROUP;
 
 @ApplicationScoped
 @Transactional
-public class DocumentRepository {
+@Deprecated
+public class DocumentRepositoryOld {
 
- private static final Logger LOGGER = Logger.getLogger(DocumentRepository.class.getName());
+ private static final Logger LOGGER = Logger.getLogger(DocumentRepositoryOld.class.getName());
 
  private final DSLContext dsl;
  private final EmbeddingService embeddingService;
@@ -58,26 +59,36 @@ public class DocumentRepository {
  };
 
  @Inject
- public DocumentRepository(DSLContext dsl, EmbeddingService embeddingService) {
+ public DocumentRepositoryOld(DSLContext dsl, EmbeddingService embeddingService) {
   this.dsl = dsl;
   this.embeddingService = embeddingService;
  }
 
- public List<UUID> createDocuments(List<DocumentRequest> documents) {
-  return dsl.insertInto(DOCUMENT)
-    .columns(DOCUMENT.TITLE, DOCUMENT.FILE_NAME, DOCUMENT.CONTENT)
-    .valuesOfRows(documents.stream()
-      .map(doc -> {
-       return DSL.row(
-         doc.name(),
-         doc.name(), // Use name as filename for now
-         doc.content());
-      })
-      .toList())
-    .returningResult(DOCUMENT.ID)
-    .fetch()
-    .map(record -> (UUID) record.value1());
+ public UUID createDocumentGroup(DocumentGroupInput input) {
+  UUID documentGroupId = dsl.insertInto(DOCUMENT_GROUP)
+    .set(DOCUMENT_GROUP.URI, input.uri())
+    .returningResult(DOCUMENT_GROUP.ID)
+    .fetchOne()
+    .value1();
+
+  return documentGroupId;
  }
+
+ // public List<UUID> createDocuments(List<DocumentGroupRequest> documents) {
+ //  return dsl.insertInto(DOCUMENT)
+ //    .columns(DOCUMENT.TITLE, DOCUMENT.FILE_NAME, DOCUMENT.CONTENT)
+ //    .valuesOfRows(documents.stream()
+ //      .map(doc -> {
+ //       return DSL.row(
+ //         doc.name(),
+ //         doc.name(), // Use name as filename for now
+ //         doc.content());
+ //      })
+ //      .toList())
+ //    .returningResult(DOCUMENT.ID)
+ //    .fetch()
+ //    .map(record -> (UUID) record.value1());
+ // }
 
  public List<Document> getAllDocuments() {
   return dsl.selectFrom(DOCUMENT)

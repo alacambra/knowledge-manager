@@ -4,7 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import tech.lacambra.kmanager.business.documents.DocumentRepository;
+import tech.lacambra.kmanager.business.documents.DocumentRepositoryOld;
 import tech.lacambra.kmanager.generated.jooq.tables.pojos.Document;
 
 import java.util.HashMap;
@@ -23,7 +23,7 @@ public class HelloAIResource {
     private static final Logger LOGGER = Logger.getLogger(HelloAIResource.class.getName());
 
     @Inject
-    DocumentRepository documentRepository;
+    DocumentRepositoryOld documentRepository;
 
     @Inject
     EmbeddingService embeddingService;

@@ -14,127 +14,137 @@ import java.util.UUID;
 
 import tech.lacambra.kmanager.generated.jooq.tables.pojos.KnowledgeUnit;
 import tech.lacambra.kmanager.resource.knowlege_manager.KnowledgeUnitWithDocumentGroupUrisResponse;
-import tech.lacambra.kmanager.business.documents.DocumentRepository;
+import tech.lacambra.kmanager.business.documents.DocumentRepositoryOld;
+import tech.lacambra.kmanager.business.kuResource.KuResourceRepository;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class KnowledgeUnitServiceConcatenationTest {
 
-    @Mock
-    private KnowledgeUnitRepository knowledgeUnitRepository;
+ @Mock
+ private KnowledgeUnitRepository knowledgeUnitRepository;
 
-    @Mock
-    private DocumentRepository documentRepository;
+ @Mock
+ private KuResourceRepository kuResourceRepository;
 
-    @Mock
-    private MinioKnowledgeUnitContentProcessor minioContentProcessor;
+ @Mock
+ private DocumentRepositoryOld documentRepository;
 
-    @Mock
-    private FileExportHelper fileExportHelper;
+ @Mock
+ private MinioKnowledgeUnitContentProcessor minioContentProcessor;
 
-    private KnowledgeUnitService knowledgeUnitService;
+ @Mock
+ private FileExportHelper fileExportHelper;
 
-    @BeforeEach
-    void setUp() {
-        knowledgeUnitService = new KnowledgeUnitService(
-            knowledgeUnitRepository,
-            documentRepository,
-            minioContentProcessor,
-            fileExportHelper
-        );
-    }
+ @Mock
+ DocumentGroupUriResolver documentGroupUriResolver;
 
-    @Test
-    void generateConcatenatedText_success() {
-        UUID kuId = UUID.randomUUID();
-        
-        KnowledgeUnit ku = new KnowledgeUnit();
-        ku.setId(kuId);
-        ku.setName("Test KU");
-        ku.setDescription("Test Description");
-        ku.setCreatedAt(LocalDateTime.now());
-        ku.setUpdatedAt(LocalDateTime.now());
+ private KnowledgeUnitService knowledgeUnitService;
 
-        List<String> documentGroupUris = List.of("test-bucket/path1", "test-bucket/path2");
-        KnowledgeUnitWithDocumentGroupUrisResponse response = new KnowledgeUnitWithDocumentGroupUrisResponse(ku, documentGroupUris);
+ @BeforeEach
+ void setUp() {
+  knowledgeUnitService = new KnowledgeUnitService(
+    knowledgeUnitRepository,
+    kuResourceRepository,
+    documentRepository,
+    minioContentProcessor,
+    fileExportHelper,
+    documentGroupUriResolver);
+ }
 
-        when(knowledgeUnitRepository.findByIdWithDocumentGroupUris(kuId))
-            .thenReturn(Optional.of(response));
-        when(minioContentProcessor.processKnowledgeUnitToText(response))
-            .thenReturn("MinIO concatenated content");
+ @Test
+ void generateConcatenatedText_success() {
+  UUID kuId = UUID.randomUUID();
 
-        String result = knowledgeUnitService.generateConcatenatedText(kuId);
+  KnowledgeUnit ku = new KnowledgeUnit();
+  ku.setId(kuId);
+  ku.setName("Test KU");
+  ku.setDescription("Test Description");
+  ku.setCreatedAt(LocalDateTime.now());
+  ku.setUpdatedAt(LocalDateTime.now());
 
-        assertEquals("MinIO concatenated content", result);
-        verify(knowledgeUnitRepository).findByIdWithDocumentGroupUris(kuId);
-        verify(minioContentProcessor).processKnowledgeUnitToText(response);
-    }
+  List<String> documentGroupUris = List.of("test-bucket/path1", "test-bucket/path2");
+  KnowledgeUnitWithDocumentGroupUrisResponse response = new KnowledgeUnitWithDocumentGroupUrisResponse(ku,
+    documentGroupUris);
 
-    @Test
-    void generateConcatenatedText_knowledgeUnitNotFound() {
-        UUID kuId = UUID.randomUUID();
+  when(knowledgeUnitRepository.findByIdWithDocumentGroupUris(kuId))
+    .thenReturn(Optional.of(response));
+  when(minioContentProcessor.processKnowledgeUnitToText(response))
+    .thenReturn("MinIO concatenated content");
 
-        when(knowledgeUnitRepository.findByIdWithDocumentGroupUris(kuId))
-            .thenReturn(Optional.empty());
+  String result = knowledgeUnitService.generateConcatenatedText(kuId);
 
-        assertThrows(KnowledgeUnitNotFoundException.class, () -> {
-            knowledgeUnitService.generateConcatenatedText(kuId);
-        });
+  assertEquals("MinIO concatenated content", result);
+  verify(knowledgeUnitRepository).findByIdWithDocumentGroupUris(kuId);
+  verify(minioContentProcessor).processKnowledgeUnitToText(response);
+ }
 
-        verify(knowledgeUnitRepository).findByIdWithDocumentGroupUris(kuId);
-        verifyNoInteractions(minioContentProcessor);
-    }
+ @Test
+ void generateConcatenatedText_knowledgeUnitNotFound() {
+  UUID kuId = UUID.randomUUID();
 
-    @Test
-    void exportToFile_withCustomFilename() {
-        UUID kuId = UUID.randomUUID();
-        String customFilename = "custom-export.txt";
-        
-        KnowledgeUnit ku = new KnowledgeUnit();
-        ku.setId(kuId);
-        ku.setName("Test KU");
+  when(knowledgeUnitRepository.findByIdWithDocumentGroupUris(kuId))
+    .thenReturn(Optional.empty());
 
-        KnowledgeUnitWithDocumentGroupUrisResponse response = new KnowledgeUnitWithDocumentGroupUrisResponse(ku, List.of());
+  assertThrows(KnowledgeUnitNotFoundException.class, () -> {
+   knowledgeUnitService.generateConcatenatedText(kuId);
+  });
 
-        when(knowledgeUnitRepository.findByIdWithDocumentGroupUris(kuId))
-            .thenReturn(Optional.of(response));
-        when(minioContentProcessor.processKnowledgeUnitToText(response))
-            .thenReturn("Export content");
-        when(fileExportHelper.writeToFile("Export content", customFilename))
-            .thenReturn(Path.of("exports/custom-export.txt"));
+  verify(knowledgeUnitRepository).findByIdWithDocumentGroupUris(kuId);
+  verifyNoInteractions(minioContentProcessor);
+ }
 
-        Path result = knowledgeUnitService.exportToFile(kuId, customFilename);
+ @Test
+ void exportToFile_withCustomFilename() {
+  UUID kuId = UUID.randomUUID();
+  String customFilename = "custom-export.txt";
 
-        assertEquals(Path.of("exports/custom-export.txt"), result);
-        verify(fileExportHelper).writeToFile("Export content", customFilename);
-        verify(fileExportHelper, never()).generateDefaultFilename(any());
-    }
+  KnowledgeUnit ku = new KnowledgeUnit();
+  ku.setId(kuId);
+  ku.setName("Test KU");
 
-    @Test
-    void exportToFile_withDefaultFilename() {
-        UUID kuId = UUID.randomUUID();
-        
-        KnowledgeUnit ku = new KnowledgeUnit();
-        ku.setId(kuId);
-        ku.setName("Test KU");
+  KnowledgeUnitWithDocumentGroupUrisResponse response = new KnowledgeUnitWithDocumentGroupUrisResponse(ku, List.of());
 
-        KnowledgeUnitWithDocumentGroupUrisResponse response = new KnowledgeUnitWithDocumentGroupUrisResponse(ku, List.of());
+  when(knowledgeUnitRepository.findByIdWithDocumentGroupUris(kuId))
+    .thenReturn(Optional.of(response));
+  when(minioContentProcessor.processKnowledgeUnitToText(response))
+    .thenReturn("Export content");
+  when(fileExportHelper.writeToFile("Export content", customFilename))
+    .thenReturn(Path.of("exports/custom-export.txt"));
 
-        when(knowledgeUnitRepository.findByIdWithDocumentGroupUris(kuId))
-            .thenReturn(Optional.of(response));
-        when(minioContentProcessor.processKnowledgeUnitToText(response))
-            .thenReturn("Export content");
-        when(fileExportHelper.generateDefaultFilename("Test KU"))
-            .thenReturn("Test_KU-20240719-120000.txt");
-        when(fileExportHelper.writeToFile("Export content", "Test_KU-20240719-120000.txt"))
-            .thenReturn(Path.of("exports/Test_KU-20240719-120000.txt"));
+  Path result = knowledgeUnitService.exportToFile(kuId, customFilename);
 
-        Path result = knowledgeUnitService.exportToFile(kuId, null);
+  assertEquals(Path.of("exports/custom-export.txt"), result);
+  verify(fileExportHelper).writeToFile("Export content", customFilename);
+  verify(fileExportHelper, never()).generateDefaultFilename(any());
+ }
 
-        assertEquals(Path.of("exports/Test_KU-20240719-120000.txt"), result);
-        verify(fileExportHelper).generateDefaultFilename("Test KU");
-        verify(fileExportHelper).writeToFile("Export content", "Test_KU-20240719-120000.txt");
-    }
+ @Test
+ void exportToFile_withDefaultFilename() {
+  UUID kuId = UUID.randomUUID();
+
+  KnowledgeUnit ku = new KnowledgeUnit();
+  ku.setId(kuId);
+  ku.setName("Test KU");
+
+  KnowledgeUnitWithDocumentGroupUrisResponse response = new KnowledgeUnitWithDocumentGroupUrisResponse(ku, List.of());
+
+  when(knowledgeUnitRepository.findByIdWithDocumentGroupUris(kuId))
+    .thenReturn(Optional.of(response));
+  when(minioContentProcessor.processKnowledgeUnitToText(response))
+    .thenReturn("Export content");
+  when(fileExportHelper.generateDefaultFilename("Test KU"))
+    .thenReturn("Test_KU-20240719-120000.txt");
+  when(fileExportHelper.writeToFile("Export content", "Test_KU-20240719-120000.txt"))
+    .thenReturn(Path.of("exports/Test_KU-20240719-120000.txt"));
+
+  Path result = knowledgeUnitService.exportToFile(kuId, null);
+
+  assertEquals(Path.of("exports/Test_KU-20240719-120000.txt"), result);
+  verify(fileExportHelper).generateDefaultFilename("Test KU");
+  verify(fileExportHelper).writeToFile("Export content", "Test_KU-20240719-120000.txt");
+ }
 }

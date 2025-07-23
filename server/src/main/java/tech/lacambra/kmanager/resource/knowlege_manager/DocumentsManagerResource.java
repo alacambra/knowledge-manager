@@ -24,14 +24,14 @@ public class DocumentsManagerResource {
     @Inject
     DocumentService documentService;
     
-    @POST
-    @Path("/upload")
-    public Response uploadDocuments(List<DocumentRequest> documents) {
-        List<UUID> documentIds = documentService.uploadDocuments(documents);
-        return Response.status(Response.Status.CREATED)
-                .entity(documentIds)
-                .build();
-    }
+    // @POST
+    // @Path("/upload")
+    // public Response uploadDocuments(List<DocumentGroupRequest> documents) {
+    //     List<UUID> documentIds = documentService.uploadDocuments(documents);
+    //     return Response.status(Response.Status.CREATED)
+    //             .entity(documentIds)
+    //             .build();
+    // }
     
     @GET
     public List<Document> getAllDocuments() {

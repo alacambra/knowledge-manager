@@ -32,8 +32,12 @@ import java.util.Optional;
 @ApplicationScoped
 public class KnowledgeUnitRepository {
 
+ private DSLContext dslContext;
+
  @Inject
- DSLContext dslContext;
+ public KnowledgeUnitRepository(DSLContext dslContext) {
+  this.dslContext = dslContext;
+ }
 
  public UUID create(KnowledgeUnitInput input) {
   UUID kuId = dslContext.insertInto(KNOWLEDGE_UNIT)
@@ -42,8 +46,7 @@ public class KnowledgeUnitRepository {
     .returningResult(KNOWLEDGE_UNIT.ID)
     .fetchOne()
     .value1();
-  
-  createDefaultResource(kuId, input.name());
+
   return kuId;
  }
 
@@ -83,21 +86,23 @@ public class KnowledgeUnitRepository {
   }
 
   List<KnowledgeUnitResourceWithDocumentGroupsResponse> resources = dslContext.select(
-      KNOWLEDGE_UNIT_RESOURCE.fields())
+    KNOWLEDGE_UNIT_RESOURCE.fields())
     .select(DOCUMENT_GROUP.fields())
     .from(KNOWLEDGE_UNIT_RESOURCE)
-    .join(KNOWLEDGE_UNIT_CONTAINED_RESOURCE).on(KNOWLEDGE_UNIT_RESOURCE.ID.eq(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_RESOURCE_ID))
-    .join(RESOURCE_CONTAINED_DOCUMENT_GROUP).on(KNOWLEDGE_UNIT_RESOURCE.ID.eq(RESOURCE_CONTAINED_DOCUMENT_GROUP.KNOWLEDGE_UNIT_RESOURCE_ID))
+    .join(KNOWLEDGE_UNIT_CONTAINED_RESOURCE)
+    .on(KNOWLEDGE_UNIT_RESOURCE.ID.eq(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_RESOURCE_ID))
+    .join(RESOURCE_CONTAINED_DOCUMENT_GROUP)
+    .on(KNOWLEDGE_UNIT_RESOURCE.ID.eq(RESOURCE_CONTAINED_DOCUMENT_GROUP.KNOWLEDGE_UNIT_RESOURCE_ID))
     .join(DOCUMENT_GROUP).on(RESOURCE_CONTAINED_DOCUMENT_GROUP.DOCUMENT_GROUP_ID.eq(DOCUMENT_GROUP.ID))
     .where(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_ID.eq(kuId))
     .orderBy(KNOWLEDGE_UNIT_RESOURCE.CREATED_AT.asc(), DOCUMENT_GROUP.CREATED_AT.asc())
     .fetch()
     .stream()
     .collect(groupingBy(
-        record -> record.into(KNOWLEDGE_UNIT_RESOURCE).into(KnowledgeUnitResource.class),
-        Collectors.mapping(
-            record -> record.into(DOCUMENT_GROUP).into(DocumentGroup.class),
-            Collectors.toList())))
+      record -> record.into(KNOWLEDGE_UNIT_RESOURCE).into(KnowledgeUnitResource.class),
+      Collectors.mapping(
+        record -> record.into(DOCUMENT_GROUP).into(DocumentGroup.class),
+        Collectors.toList())))
     .entrySet()
     .stream()
     .map(entry -> new KnowledgeUnitResourceWithDocumentGroupsResponse(entry.getKey(), entry.getValue()))
@@ -120,9 +125,12 @@ public class KnowledgeUnitRepository {
     .from(DOCUMENT)
     .join(DOCUMENT_GROUP_DOCUMENT).on(DOCUMENT.ID.eq(DOCUMENT_GROUP_DOCUMENT.DOCUMENT_ID))
     .join(DOCUMENT_GROUP).on(DOCUMENT_GROUP_DOCUMENT.DOCUMENT_GROUP_ID.eq(DOCUMENT_GROUP.ID))
-    .join(RESOURCE_CONTAINED_DOCUMENT_GROUP).on(DOCUMENT_GROUP.ID.eq(RESOURCE_CONTAINED_DOCUMENT_GROUP.DOCUMENT_GROUP_ID))
-    .join(KNOWLEDGE_UNIT_RESOURCE).on(RESOURCE_CONTAINED_DOCUMENT_GROUP.KNOWLEDGE_UNIT_RESOURCE_ID.eq(KNOWLEDGE_UNIT_RESOURCE.ID))
-    .join(KNOWLEDGE_UNIT_CONTAINED_RESOURCE).on(KNOWLEDGE_UNIT_RESOURCE.ID.eq(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_RESOURCE_ID))
+    .join(RESOURCE_CONTAINED_DOCUMENT_GROUP)
+    .on(DOCUMENT_GROUP.ID.eq(RESOURCE_CONTAINED_DOCUMENT_GROUP.DOCUMENT_GROUP_ID))
+    .join(KNOWLEDGE_UNIT_RESOURCE)
+    .on(RESOURCE_CONTAINED_DOCUMENT_GROUP.KNOWLEDGE_UNIT_RESOURCE_ID.eq(KNOWLEDGE_UNIT_RESOURCE.ID))
+    .join(KNOWLEDGE_UNIT_CONTAINED_RESOURCE)
+    .on(KNOWLEDGE_UNIT_RESOURCE.ID.eq(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_RESOURCE_ID))
     .where(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_ID.eq(kuId))
     .orderBy(KNOWLEDGE_UNIT_RESOURCE.CREATED_AT.asc(), DOCUMENT_GROUP.CREATED_AT.asc(), DOCUMENT.CREATED_AT.asc())
     .fetchInto(Document.class);
@@ -142,9 +150,12 @@ public class KnowledgeUnitRepository {
 
   List<String> documentGroupUris = dslContext.select(DOCUMENT_GROUP.URI)
     .from(DOCUMENT_GROUP)
-    .join(RESOURCE_CONTAINED_DOCUMENT_GROUP).on(DOCUMENT_GROUP.ID.eq(RESOURCE_CONTAINED_DOCUMENT_GROUP.DOCUMENT_GROUP_ID))
-    .join(KNOWLEDGE_UNIT_RESOURCE).on(RESOURCE_CONTAINED_DOCUMENT_GROUP.KNOWLEDGE_UNIT_RESOURCE_ID.eq(KNOWLEDGE_UNIT_RESOURCE.ID))
-    .join(KNOWLEDGE_UNIT_CONTAINED_RESOURCE).on(KNOWLEDGE_UNIT_RESOURCE.ID.eq(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_RESOURCE_ID))
+    .join(RESOURCE_CONTAINED_DOCUMENT_GROUP)
+    .on(DOCUMENT_GROUP.ID.eq(RESOURCE_CONTAINED_DOCUMENT_GROUP.DOCUMENT_GROUP_ID))
+    .join(KNOWLEDGE_UNIT_RESOURCE)
+    .on(RESOURCE_CONTAINED_DOCUMENT_GROUP.KNOWLEDGE_UNIT_RESOURCE_ID.eq(KNOWLEDGE_UNIT_RESOURCE.ID))
+    .join(KNOWLEDGE_UNIT_CONTAINED_RESOURCE)
+    .on(KNOWLEDGE_UNIT_RESOURCE.ID.eq(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_RESOURCE_ID))
     .where(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_ID.eq(kuId))
     .orderBy(KNOWLEDGE_UNIT_RESOURCE.CREATED_AT.asc(), DOCUMENT_GROUP.CREATED_AT.asc())
     .fetchInto(String.class);
@@ -168,40 +179,17 @@ public class KnowledgeUnitRepository {
     .execute();
  }
 
- private void createDefaultResource(UUID kuId, String kuName) {
-  UUID resourceId = dslContext.insertInto(KNOWLEDGE_UNIT_RESOURCE)
-    .set(KNOWLEDGE_UNIT_RESOURCE.NAME, "Default Resource")
-    .set(KNOWLEDGE_UNIT_RESOURCE.DESCRIPTION, "Default resource for " + kuName)
-    .returningResult(KNOWLEDGE_UNIT_RESOURCE.ID)
-    .fetchOne()
-    .value1();
-
+ public void addKuResourceToKnowledgeUnit(UUID kuId, UUID kuResourceId) {
   dslContext.insertInto(KNOWLEDGE_UNIT_CONTAINED_RESOURCE)
     .set(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_ID, kuId)
-    .set(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_RESOURCE_ID, resourceId)
+    .set(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_RESOURCE_ID, kuResourceId)
     .set(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.IS_DEFAULT, true)
-    .execute();
-
-  createDefaultDocumentGroup(resourceId);
- }
-
- private void createDefaultDocumentGroup(UUID resourceId) {
-  UUID documentGroupId = dslContext.insertInto(DOCUMENT_GROUP)
-    .set(DOCUMENT_GROUP.URI, "default-documents")
-    .returningResult(DOCUMENT_GROUP.ID)
-    .fetchOne()
-    .value1();
-
-  dslContext.insertInto(RESOURCE_CONTAINED_DOCUMENT_GROUP)
-    .set(RESOURCE_CONTAINED_DOCUMENT_GROUP.KNOWLEDGE_UNIT_RESOURCE_ID, resourceId)
-    .set(RESOURCE_CONTAINED_DOCUMENT_GROUP.DOCUMENT_GROUP_ID, documentGroupId)
-    .set(RESOURCE_CONTAINED_DOCUMENT_GROUP.IS_DEFAULT, true)
     .execute();
  }
 
  public void addDocumentsToDefaultDocumentGroup(UUID kuId, List<UUID> documentIds) {
   UUID documentGroupId = getDefaultDocumentGroupId(kuId);
-  
+
   dslContext.insertInto(DOCUMENT_GROUP_DOCUMENT)
     .columns(DOCUMENT_GROUP_DOCUMENT.DOCUMENT_GROUP_ID, DOCUMENT_GROUP_DOCUMENT.DOCUMENT_ID)
     .valuesOfRows(documentIds.stream()
@@ -212,7 +200,7 @@ public class KnowledgeUnitRepository {
 
  public void removeDocumentsFromDefaultDocumentGroup(UUID kuId, List<UUID> documentIds) {
   UUID documentGroupId = getDefaultDocumentGroupId(kuId);
-  
+
   dslContext.deleteFrom(DOCUMENT_GROUP_DOCUMENT)
     .where(DOCUMENT_GROUP_DOCUMENT.DOCUMENT_GROUP_ID.eq(documentGroupId))
     .and(DOCUMENT_GROUP_DOCUMENT.DOCUMENT_ID.in(documentIds))
@@ -222,9 +210,12 @@ public class KnowledgeUnitRepository {
  private UUID getDefaultDocumentGroupId(UUID kuId) {
   return dslContext.select(DOCUMENT_GROUP.ID)
     .from(DOCUMENT_GROUP)
-    .join(RESOURCE_CONTAINED_DOCUMENT_GROUP).on(DOCUMENT_GROUP.ID.eq(RESOURCE_CONTAINED_DOCUMENT_GROUP.DOCUMENT_GROUP_ID))
-    .join(KNOWLEDGE_UNIT_RESOURCE).on(RESOURCE_CONTAINED_DOCUMENT_GROUP.KNOWLEDGE_UNIT_RESOURCE_ID.eq(KNOWLEDGE_UNIT_RESOURCE.ID))
-    .join(KNOWLEDGE_UNIT_CONTAINED_RESOURCE).on(KNOWLEDGE_UNIT_RESOURCE.ID.eq(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_RESOURCE_ID))
+    .join(RESOURCE_CONTAINED_DOCUMENT_GROUP)
+    .on(DOCUMENT_GROUP.ID.eq(RESOURCE_CONTAINED_DOCUMENT_GROUP.DOCUMENT_GROUP_ID))
+    .join(KNOWLEDGE_UNIT_RESOURCE)
+    .on(RESOURCE_CONTAINED_DOCUMENT_GROUP.KNOWLEDGE_UNIT_RESOURCE_ID.eq(KNOWLEDGE_UNIT_RESOURCE.ID))
+    .join(KNOWLEDGE_UNIT_CONTAINED_RESOURCE)
+    .on(KNOWLEDGE_UNIT_RESOURCE.ID.eq(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_RESOURCE_ID))
     .where(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.KNOWLEDGE_UNIT_ID.eq(kuId))
     .and(KNOWLEDGE_UNIT_CONTAINED_RESOURCE.IS_DEFAULT.eq(true))
     .and(RESOURCE_CONTAINED_DOCUMENT_GROUP.IS_DEFAULT.eq(true))

@@ -1,14 +1,9 @@
 package tech.lacambra.kmanager.resource.knowlege_manager;
 
 import java.util.List;
-import java.util.UUID;
 
 public record KnowledgeUnitRequest(
   String name,
   String description,
-  List<DocumentRequest> newDocuments,
-  List<UUID> addedDocumentsIds,
-  List<UUID> removedDocumentsIds
-  
-  ) {
+  List<KuResourceRequest> kuResourceRequests) {
 }

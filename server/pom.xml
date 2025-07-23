@@ -128,6 +128,13 @@
    <version>0.33.0</version>
   </dependency>
 
+  <!-- PDF Processing -->
+  <dependency>
+   <groupId>org.apache.pdfbox</groupId>
+   <artifactId>pdfbox</artifactId>
+   <version>3.0.3</version>
+  </dependency>
+
   <dependency>
    <groupId>io.quarkus</groupId>
    <artifactId>quarkus-junit5</artifactId>

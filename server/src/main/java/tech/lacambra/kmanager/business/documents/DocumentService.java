@@ -6,21 +6,21 @@ import java.util.UUID;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import tech.lacambra.kmanager.generated.jooq.tables.pojos.Document;
-import tech.lacambra.kmanager.resource.knowlege_manager.DocumentRequest;
+import tech.lacambra.kmanager.resource.knowlege_manager.DocumentGroupRequest;
 
 @ApplicationScoped
 public class DocumentService {
 
-    private DocumentRepository documentRepository;
+    private DocumentRepositoryOld documentRepository;
 
     @Inject
-    public DocumentService(DocumentRepository documentRepository) {
+    public DocumentService(DocumentRepositoryOld documentRepository) {
         this.documentRepository = documentRepository;
     }
 
-    public List<UUID> uploadDocuments(List<DocumentRequest> documents) {
-        return documentRepository.createDocuments(documents);
-    }
+    // public List<UUID> uploadDocuments(List<DocumentGroupRequest> documents) {
+    //     return documentRepository.createDocuments(documents);
+    // }
 
     public List<Document> getAllDocuments() {
         return documentRepository.getAllDocuments();

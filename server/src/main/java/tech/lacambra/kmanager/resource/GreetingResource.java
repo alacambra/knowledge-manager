@@ -5,7 +5,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import tech.lacambra.kmanager.business.documents.DocumentRepository;
+import tech.lacambra.kmanager.business.documents.DocumentRepositoryOld;
 
 import java.util.logging.Logger;
 
@@ -16,7 +16,7 @@ public class GreetingResource {
     private static final Logger LOGGER = Logger.getLogger(GreetingResource.class.getName());
     
     @Inject
-    DocumentRepository documentRepository;
+    DocumentRepositoryOld documentRepository;
     
     @GET
     @Produces(MediaType.TEXT_PLAIN)
